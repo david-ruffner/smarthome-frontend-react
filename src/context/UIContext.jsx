@@ -11,12 +11,12 @@ export function UIProvider({ children }) {
     const [ friendlyName, setFriendlyName ] = useState('');
 
     // Weather views
-    const [ isCurrentWeatherVisible, setIsCurrentWeatherVisible ] = useState(true);
-    const [ isTodayWeatherVisible, setIsTodayWeatherVisible ] = useState(false); // TODO: Revert to false
+    const [ isCurrentWeatherVisible, setIsCurrentWeatherVisible ] = useState(false); // TODO: Revert to true
+    const [ isTodayWeatherVisible, setIsTodayWeatherVisible ] = useState(false);
     const [ isTomorrowWeatherVisible, setIsTomorrowWeatherVisible ] = useState(false);
-    const [ is3DayWeatherVisible, setIs3DayWeatherVisible ] = useState(false);
+    const [ is3DayWeatherVisible, setIs3DayWeatherVisible ] = useState(true); // TODO: Revert to false
     const [ is7DayWeatherVisible, setIs7DayWeatherVisible ] = useState(false);
-    const [ isWeatherTrendsVisible, setIsWeatherTrendsVisible ] = useState(false); // TODO: Revert to false
+    const [ isWeatherTrendsVisible, setIsWeatherTrendsVisible ] = useState(false);
     const [ currentWeatherView, setCurrentWeatherView ] = useState('current');
 
     // Weather selectors
@@ -65,6 +65,36 @@ export function UIProvider({ children }) {
         setIsWeatherTrendsVisible(false);
     })
 
+    // Stuff for the dashboard carousel
+    const [ currentDashboardIndex, setCurrentDashboardIndex ] = useState(0);
+    const [ dashboardOffset, setDashboardOffset ] = useState(-750);
+    const [ minDashboardIndex ] = useState(-1); // Has to be manually set here
+    const [ maxDashboardIndex ] = useState(1); // Has to be manually set here
+
+    const slideDashboardCarousel = useCallback((newIndex) => {
+        if (newIndex < minDashboardIndex || newIndex > maxDashboardIndex) {
+            return;
+        }
+
+        if (newIndex < currentDashboardIndex) {
+            let multiplier = (currentDashboardIndex < 0 ? currentDashboardIndex * -1 : currentDashboardIndex) -
+                (newIndex < 0 ? newIndex * -1 : newIndex);
+            if (multiplier < 0) multiplier *= -1;
+
+            let multiplierValue = 750 * multiplier;
+            setDashboardOffset(dashboardOffset + multiplierValue);
+            setCurrentDashboardIndex(newIndex);
+        } else if (newIndex > currentDashboardIndex) {
+            let multiplier = (currentDashboardIndex < 0 ? currentDashboardIndex * -1 : currentDashboardIndex) +
+                (newIndex < 0 ? newIndex * -1 : newIndex);
+            if (multiplier < 0) multiplier *= -1;
+
+            let multiplierValue = 750 * multiplier;
+            setDashboardOffset(dashboardOffset - multiplierValue);
+            setCurrentDashboardIndex(newIndex);
+        }
+    })
+
     const toggleWeatherTrendView = useCallback((weatherTrendView) => {
         hideAllWeatherViews();
 
@@ -79,6 +109,7 @@ export function UIProvider({ children }) {
 
     const toggleWeatherView = useCallback((weatherView) => {
         hideAllWeatherTrendViews();
+        hideAllWeatherViews();
 
         if (Object.hasOwn(weatherViewMap, weatherView)) {
             // Toggle off current view
@@ -149,7 +180,8 @@ export function UIProvider({ children }) {
             uiActions, toggleWeatherView,
             currentWeatherView, toggleWeatherTrendView,
             currentWeatherTrendView, hideAllWeatherTrendViews,
-            setCurrentWeatherView
+            setCurrentWeatherView, dashboardOffset,
+            slideDashboardCarousel, currentDashboardIndex
         }}>
             {children}
         </UIContext.Provider>
