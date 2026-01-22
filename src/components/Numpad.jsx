@@ -3,10 +3,16 @@ import {useEffect, useState} from "react";
 import {BACKEND_HOST} from "./Constants.jsx";
 import {notify} from "../services/NotificationService.jsx";
 import {isStrEmpty} from "../utils/Utils.js";
+import {useUI} from "../context/UIContext.jsx";
 
-function Numpad({ isVisible, setIsNumpadVisible, setIsUserSelectVisible,
-                isLoginPageVisible, setIsLoginPageVisible, setIsDashboardVisible,
-                setFriendlyName }) {
+function Numpad() {
+
+    const {
+        isNumpadVisible, setIsNumpadVisible, setIsUserSelectVisible,
+        isLoginPageVisible, setIsLoginPageVisible, setIsDashboardVisible,
+        setFriendlyName
+    } = useUI();
+
     const [numpadVal, setNumpadVal] = useState("");
     const [ inErrState, setInErrState ] = useState(false);
 
@@ -72,7 +78,7 @@ function Numpad({ isVisible, setIsNumpadVisible, setIsUserSelectVisible,
         onNumpadValUpdate(numpadVal);
     }, [numpadVal]);
 
-    // if (!isVisible) return null;
+    // if (!isNumpadVisible) return null;
 
     function numBtnOnClick(e) {
         let target = e.currentTarget;
@@ -108,7 +114,7 @@ function Numpad({ isVisible, setIsNumpadVisible, setIsUserSelectVisible,
 
     return (
         <>
-            <div className={`numpad ${isVisible && isLoginPageVisible ? "is-visible" : ""}`}>
+            <div className={`numpad ${isNumpadVisible && isLoginPageVisible ? "is-visible" : ""}`}>
                 <p data-value={'1'} onClick={numBtnOnClick} className={"frosted-glass numpad-btn"}>1</p>
                 <p data-value={'2'} onClick={numBtnOnClick} className={'frosted-glass numpad-btn'}>2</p>
                 <p data-value={'3'} onClick={numBtnOnClick} className={'frosted-glass numpad-btn'}>3</p>

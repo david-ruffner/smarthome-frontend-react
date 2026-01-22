@@ -127,3 +127,20 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.ui-disabled {
+    opacity: 0;
+    pointer-events: none;
+    /*visibility: hidden;*/
+    /*height: 0px !important;*/
+}
+
+.divider {
+    height: 1px;
+    background-color: #888888;
+}
+
+.vertical-divider {
+    width: 1px;
+    background-color: #888888;
+}

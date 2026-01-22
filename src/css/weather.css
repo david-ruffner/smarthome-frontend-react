@@ -1,0 +1,24 @@
+#weather-container {
+    height: 920px;
+    position: relative;
+}
+
+.weather-panel {
+    position: absolute;
+    inset: 0;
+    opacity: 1;
+    overflow: hidden;
+    transition:
+        opacity 500ms ease-in-out,
+        max-height 500ms ease-in-out;
+}
+
+.weather-panel.is-hiding {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.weather-panel.is-collapsed {
+    max-height: 0;
+    visibility: hidden;
+}

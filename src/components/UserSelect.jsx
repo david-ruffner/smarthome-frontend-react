@@ -2,6 +2,7 @@ import "/src/css/components/UserSelect.css"
 import {useEffect, useState} from "react";
 import {BACKEND_HOST} from "./Constants.jsx";
 import {notify} from "../services/NotificationService.jsx";
+import {useUI} from "../context/UIContext.jsx";
 
 function User({ letter, name, username, onSelect, setIsUserSettingsVisible }) {
     function onUserClick(e) {
@@ -50,7 +51,7 @@ function User({ letter, name, username, onSelect, setIsUserSettingsVisible }) {
     )
 }
 
-async function getUsers() {
+async function getUsers(hideAll, setIsUserSelectVisible) {
     const res = await fetch(`${BACKEND_HOST}/userSettings/getAllUsers`, {
         method: 'GET',
         headers: {
@@ -62,19 +63,26 @@ async function getUsers() {
         notify("There was a problem logging in. Please see the console.");
         const err = await res.body;
         console.log(`Error while fetching users: ${err}`);
+
+        hideAll();
+        setIsUserSelectVisible(true);
     }
 
     return await res.json();
 }
 
-function UserSelect({ setNumpadIsVisible, isUserSelectVisible,
-                        setIsUserSelectVisible }) {
+function UserSelect() {
+
+    const {
+        setIsNumpadVisible, isUserSelectVisible,
+        setIsUserSelectVisible, hideAll
+    } = useUI();
 
     const [ users, setUsers ] = useState([]);
     // const [ isUserSelectVisible, setIsUserSelectVisible ] = useState(false); // TODO: Revert to true
 
     useEffect(() => {
-        getUsers()
+        getUsers(hideAll, setIsUserSelectVisible)
             .then(data => {
                 console.log(data);
                 setUsers(data)
@@ -90,7 +98,7 @@ function UserSelect({ setNumpadIsVisible, isUserSelectVisible,
                         letter={user.nameFirstLetter}
                         name={user.name}
                         username={user.username}
-                        onSelect={() => setNumpadIsVisible(true)}
+                        onSelect={() => setIsNumpadVisible(true)}
                         setIsUserSettingsVisible={setIsUserSelectVisible}
                     />
                 ))}

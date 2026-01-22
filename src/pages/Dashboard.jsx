@@ -1,10 +1,16 @@
 import "/src/css/Dashboard.css"
-import {useState} from "react";
-import WeatherView from "../components/WeatherView.jsx";
+import WeatherView from "../components/weather/WeatherView.jsx";
+import {useUI} from "../context/UIContext.jsx";
 
-function Dashboard({ isDashboardVisible, setIsDashboardVisible, friendlyName }) {
+function Dashboard() {
 
-    const [isWeatherViewVisible, setIsWeatherViewVisible] = useState(true) // TODO: Revert to false
+    const {
+        isDashboardVisible, setIsDashboardVisible,
+        friendlyName, isWeatherViewVisible,
+        setIsWeatherViewVisible
+    } = useUI();
+
+    // const [isWeatherViewVisible, setIsWeatherViewVisible] = useState(true) // TODO: Revert to false
 
     return (
         <>
