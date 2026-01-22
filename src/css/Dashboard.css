@@ -1,0 +1,20 @@
+#dashboard-container {
+    width: 100vw;
+    height: 100vh;
+
+    transition: opacity 500ms ease-in-out;
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+#dashboard-container.is-visible {
+    pointer-events: auto;
+    opacity: 1;
+    visibility: visible;
+}
+
+#navbar-container {
+    padding: 25px;
+    width: 100vw;
+}

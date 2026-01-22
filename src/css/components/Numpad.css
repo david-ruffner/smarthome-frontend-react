@@ -1,0 +1,57 @@
+.numpad {
+    height: auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 25px;
+
+    transition: opacity 1000ms ease-in-out;
+    opacity: 0;
+
+    pointer-events: none;
+    visibility: hidden;
+}
+
+.numpad.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+}
+
+.numpad p {
+    margin: 0;
+    padding: 25px;
+    font-size: 48pt;
+}
+
+.numpad p:active {
+    background-color: var(--btn-light-blue);
+}
+
+.numpad-btn {
+    width: 125px;
+}
+
+.numpad-input {
+    grid-column: 1 / span 3;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    justify-self: center;
+    align-self: center;
+    grid-column-gap: 15px;
+    margin-top: 50px;
+}
+
+.numpad-input p {
+    color: white;
+    border-bottom: 1px solid white;
+}
+
+.numpad-input p.err-state {
+    color: var(--err-state-red);
+    border-bottom: 1px solid var(--err-state-red);
+}
+
+#numpad-back-btn {
+    grid-column: 1 / span 3;
+    margin-top: 100px;
+}

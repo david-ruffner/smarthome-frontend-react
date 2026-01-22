@@ -1,0 +1,24 @@
+.login-stage {
+    min-height: 100vh;
+    min-width: 100vw;
+    display: grid;
+    place-items: center;
+}
+
+/* Make all direct children overlap in the same grid cell */
+.login-stage > * {
+    grid-area: 1 / 1;
+}
+
+#login-page {
+    transition: opacity 500ms ease-in-out;
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+#login-page.is-visible {
+    pointer-events: auto;
+    opacity: 1;
+    visibility: visible;
+}
