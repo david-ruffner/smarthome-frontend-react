@@ -66,6 +66,11 @@ function SevenDayWeather() {
 
         <div id={'seven-day-weather-container'} className={className}>
             {Object.keys(dailyForecast).map((dayKey) => {
+                const dayData = dailyForecast?.[dayKey];
+                if (!dayData?.daytimePeriod || !dayData?.nighttimePeriod) {
+                    return null;
+                }
+
                 const activePeriod = activeBodyByDay[dayKey] ?? 'day';
 
                 return (
@@ -85,46 +90,46 @@ function SevenDayWeather() {
                         <div className={`day-weather-body-container body-daytime ${activePeriod === 'day' ? 'body-active' : ''} frosted-glass`}>
                             <CurrentWeatherBodyValue
                                 header={'Temperature'}
-                                value={dailyForecast[dayKey].daytimePeriod.temperatureStr}
+                                value={dayData.daytimePeriod.temperatureStr}
                             />
                             <CurrentWeatherBodyValue
                                 header={'Feels Like'}
-                                value={dailyForecast[dayKey].daytimePeriod.feelsLikeTempStr}
+                                value={dayData.daytimePeriod.feelsLikeTempStr}
                             />
                             <CurrentWeatherBodyValue
                                 header={'Forecast'}
-                                value={dailyForecast[dayKey].daytimePeriod.detailedForecast}
+                                value={dayData.daytimePeriod.detailedForecast}
                             />
                             <CurrentWeatherBodyValue
                                 header={'Winds'}
-                                value={dailyForecast[dayKey].daytimePeriod.windStr}
+                                value={dayData.daytimePeriod.windStr}
                             />
                             <CurrentWeatherBodyValue
                                 header={'Humidity'}
-                                value={`${dailyForecast[dayKey].daytimePeriod.relativeHumidity}%`}
+                                value={`${dayData.daytimePeriod.relativeHumidity}%`}
                             />
                         </div>
 
                         <div className={`day-weather-body-container body-nighttime ${activePeriod === 'night' ? 'body-active' : ''} frosted-glass`}>
                             <CurrentWeatherBodyValue
                                 header={'Temperature'}
-                                value={dailyForecast[dayKey].nighttimePeriod.temperatureStr}
+                                value={dayData.nighttimePeriod.temperatureStr}
                             />
                             <CurrentWeatherBodyValue
                                 header={'Feels Like'}
-                                value={dailyForecast[dayKey].nighttimePeriod.feelsLikeTempStr}
+                                value={dayData.nighttimePeriod.feelsLikeTempStr}
                             />
                             <CurrentWeatherBodyValue
                                 header={'Forecast'}
-                                value={dailyForecast[dayKey].nighttimePeriod.detailedForecast}
+                                value={dayData.nighttimePeriod.detailedForecast}
                             />
                             <CurrentWeatherBodyValue
                                 header={'Winds'}
-                                value={dailyForecast[dayKey].nighttimePeriod.windStr}
+                                value={dayData.nighttimePeriod.windStr}
                             />
                             <CurrentWeatherBodyValue
                                 header={'Humidity'}
-                                value={`${dailyForecast[dayKey].nighttimePeriod.relativeHumidity}%`}
+                                value={`${dayData.nighttimePeriod.relativeHumidity}%`}
                             />
                         </div>
                     </div>

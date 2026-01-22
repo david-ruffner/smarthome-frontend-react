@@ -1,4 +1,4 @@
-import {createContext, useCallback, useContext, useMemo, useState} from "react";
+import {createContext, useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 
 const UIContext = createContext(null);
 
@@ -67,6 +67,7 @@ export function UIProvider({ children }) {
 
     // Stuff for the dashboard carousel
     const [ currentDashboardIndex, setCurrentDashboardIndex ] = useState(0);
+    const [ newDashboardIndex, setNewDashboardIndex ] = useState(0);
     const [ dashboardOffset, setDashboardOffset ] = useState(-750);
     const [ minDashboardIndex ] = useState(-1); // Has to be manually set here
     const [ maxDashboardIndex ] = useState(1); // Has to be manually set here
@@ -76,24 +77,27 @@ export function UIProvider({ children }) {
             return;
         }
 
+        const steps = Math.abs(newIndex - currentDashboardIndex);
+        const delta = 750 * steps;
+
         if (newIndex < currentDashboardIndex) {
-            let multiplier = (currentDashboardIndex < 0 ? currentDashboardIndex * -1 : currentDashboardIndex) -
-                (newIndex < 0 ? newIndex * -1 : newIndex);
-            if (multiplier < 0) multiplier *= -1;
-
-            let multiplierValue = 750 * multiplier;
-            setDashboardOffset(dashboardOffset + multiplierValue);
-            setCurrentDashboardIndex(newIndex);
+            setDashboardOffset(prev => prev + delta);
         } else if (newIndex > currentDashboardIndex) {
-            let multiplier = (currentDashboardIndex < 0 ? currentDashboardIndex * -1 : currentDashboardIndex) +
-                (newIndex < 0 ? newIndex * -1 : newIndex);
-            if (multiplier < 0) multiplier *= -1;
-
-            let multiplierValue = 750 * multiplier;
-            setDashboardOffset(dashboardOffset - multiplierValue);
-            setCurrentDashboardIndex(newIndex);
+            setDashboardOffset(prev => prev - delta);
         }
+        setCurrentDashboardIndex(newIndex);
     })
+
+    const isFirstRender = useRef(true);
+
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+
+        slideDashboardCarousel(newDashboardIndex);
+    }, [newDashboardIndex]);
 
     const toggleWeatherTrendView = useCallback((weatherTrendView) => {
         hideAllWeatherViews();
@@ -181,7 +185,9 @@ export function UIProvider({ children }) {
             currentWeatherView, toggleWeatherTrendView,
             currentWeatherTrendView, hideAllWeatherTrendViews,
             setCurrentWeatherView, dashboardOffset,
-            slideDashboardCarousel, currentDashboardIndex
+            slideDashboardCarousel, currentDashboardIndex,
+            setCurrentDashboardIndex, newDashboardIndex,
+            setNewDashboardIndex
         }}>
             {children}
         </UIContext.Provider>

@@ -1,21 +1,25 @@
 import { useSwipeable } from "react-swipeable";
 import {useUI} from "../context/UIContext.jsx";
+import {useEffect, useRef} from "react";
 
 
 
 function SwipeContainer({ children }) {
     const {
-        currentDashboardIndex, slideDashboardCarousel
+        currentDashboardIndex, slideDashboardCarousel,
+        newDashboardIndex, setNewDashboardIndex
     } = useUI();
 
     const handlers = useSwipeable({
         onSwipedLeft: () => {
             console.log(`Swiped Left!`);
-            slideDashboardCarousel(currentDashboardIndex + 1);
+            // slideDashboardCarousel(currentDashboardIndex + 1);
+            setNewDashboardIndex(currentDashboardIndex + 1);
         },
         onSwipedRight: () => {
             console.log(`Swiped Right!`);
-            slideDashboardCarousel(currentDashboardIndex - 1)
+            // slideDashboardCarousel(currentDashboardIndex - 1)
+            setNewDashboardIndex(currentDashboardIndex - 1);
         },
         delta: {
             left: 60,

@@ -61,7 +61,8 @@ function TodayWeather() {
         <div id={'today-weather-container'} className={className}>
             <h1 className={'frosted-glass'}>Today's Forecast</h1>
 
-            {hourlyForecast.map((period, index) => (
+            {Array.isArray(hourlyForecast) &&
+                hourlyForecast.map((period, index) => (
                 <HourlyWeatherPanel
                     key={index}
                     timeStr={getTimeFor24Hr({time: period.zonedStartTime})}

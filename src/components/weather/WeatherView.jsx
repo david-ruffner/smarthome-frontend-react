@@ -25,6 +25,14 @@ function WeatherView() {
 
     return (
         <>
+            <style>{`
+                #weather-container {
+                    margin: 0 15px 0 15px;
+                    height: 800px;
+                    position: relative;
+                }
+            `}</style>
+
             <div id={'weather-container'} className={`frosted-glass ${isWeatherViewVisible ? '' : 'ui-disabled'}`}>
                 <CurrentWeather
                     isCurrentWeatherVisible={isCurrentWeatherVisible}
