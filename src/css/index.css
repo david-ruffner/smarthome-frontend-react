@@ -1,13 +1,20 @@
+html {
+    scrollbar-gutter: stable;
+}
+
 html,
 body {
     width: 720px;
     overflow-x: hidden;
+
 }
 
 :root {
     --background-gray: #242424;
     --btn-green: #6FC03F;
     --btn-light-blue: #3793ff;
+    --btn-soft-cyan: #a9fff7;
+    --btn-blush-rose: #da667b;
     --err-state-red: rgba(255, 0, 0, 0.75);
 
     font-family: Roboto, sans-serif;
@@ -46,6 +53,16 @@ body {
 
 .frosted-glass-blue {
     background: rgba(0, 0, 255, 0.15); /* translucent white */
+    backdrop-filter: blur(10px);          /* creates the frosted look */
+    -webkit-backdrop-filter: blur(10px);  /* for Safari support */
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    height: fit-content;
+}
+
+.frosted-glass-faded-blue {
+    background: rgba(0, 0, 255, 0.10); /* translucent white */
     backdrop-filter: blur(10px);          /* creates the frosted look */
     -webkit-backdrop-filter: blur(10px);  /* for Safari support */
     border-radius: 10px;
@@ -126,4 +143,21 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+.ui-disabled {
+    opacity: 0;
+    pointer-events: none;
+    /*visibility: hidden;*/
+    /*height: 0px !important;*/
+}
+
+.divider {
+    height: 1px;
+    background-color: #888888;
+}
+
+.vertical-divider {
+    width: 1px;
+    background-color: #888888;
 }

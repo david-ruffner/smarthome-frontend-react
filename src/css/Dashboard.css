@@ -16,5 +16,10 @@
 
 #navbar-container {
     padding: 25px;
-    width: 100vw;
+    /*width: 100vw;*/
+}
+
+#navbar-container > h1 {
+    text-align: center;
+    margin-left: 35px;
 }
