@@ -46,7 +46,7 @@ function App() {
        }
 
         let data = await resp.json();
-        console.log(data);
+        console.log(data); // TODO: Remove
         setFriendlyName(data.name);
         setIsLoginPageVisible(false);
         setIsDashboardVisible(true);

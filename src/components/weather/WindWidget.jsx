@@ -17,10 +17,10 @@ const dirToDeg = {
     NNW: 337.5
 };
 
-function WindWidget({ windDirection }) {
+function WindWidget({ windDirection, customClass = '' }) {
     return (
         <>
-            <div className="wind-speed-container frosted-glass-blue">
+            <div className={`wind-speed-container frosted-glass-blue ${customClass !== '' ? customClass : ''}`}>
                 <svg
                     className="wind-speed-arrow"
                     viewBox="0 0 24 24"

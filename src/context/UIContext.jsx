@@ -11,12 +11,24 @@ export function UIProvider({ children }) {
     const [ friendlyName, setFriendlyName ] = useState('');
 
     // Weather views
-    const [ isCurrentWeatherVisible, setIsCurrentWeatherVisible ] = useState(true); // TODO: Revert to false
-    const [ isTodayWeatherVisible, setIsTodayWeatherVisible ] = useState(false);
+    const [ isCurrentWeatherVisible, setIsCurrentWeatherVisible ] = useState(true);
+    const [ isTodayWeatherVisible, setIsTodayWeatherVisible ] = useState(false); // TODO: Revert to false
     const [ isTomorrowWeatherVisible, setIsTomorrowWeatherVisible ] = useState(false);
     const [ is3DayWeatherVisible, setIs3DayWeatherVisible ] = useState(false);
     const [ is7DayWeatherVisible, setIs7DayWeatherVisible ] = useState(false);
+    const [ isWeatherTrendsVisible, setIsWeatherTrendsVisible ] = useState(false); // TODO: Revert to false
     const [ currentWeatherView, setCurrentWeatherView ] = useState('current');
+
+    // Weather selectors
+    const [ isWeatherViewSelectorVisible, setIsWeatherViewSelectorVisible ] = useState(true);
+    const [ isWeatherTrendsSelectorVisible, setIsWeatherTrendsSelectorVisible ] = useState(false);
+
+    // Weather trend views
+    const [ isWeatherTrendPrecipitationVisible, setIsWeatherTrendPrecipitationVisible ] = useState(false);
+    const [ isWeatherTrendTempVisible, setIsWeatherTrendTempVisible ] = useState(false);
+    const [ isWeatherTrendHumidityVisible, setIsWeatherTrendHumidityVisible ] = useState(false);
+    const [ isWeatherTrendFeelsLikeVisible, setIsWeatherTrendFeelsLikeVisible ] = useState(false);
+    const [ currentWeatherTrendView, setCurrentWeatherTrendView ] = useState('trends-precipitation');
 
     // Map weather view selectors to weather views
     const weatherViewMap = useMemo(() => ({
@@ -24,19 +36,66 @@ export function UIProvider({ children }) {
         'today': setIsTodayWeatherVisible,
         'tomorrow': setIsTomorrowWeatherVisible,
         '3-day': setIs3DayWeatherVisible,
-        '7-day': setIs7DayWeatherVisible
+        '7-day': setIs7DayWeatherVisible,
+        'trends': setIsWeatherTrendsVisible
     }), []);
 
+    // Map weather trend selectors to weather trend views
+    const weatherTrendMap = useMemo(() => ({
+        'trends-precipitation': setIsWeatherTrendPrecipitationVisible,
+        'trends-temperature': setIsWeatherTrendTempVisible,
+        'trends-humidity': setIsWeatherTrendHumidityVisible,
+        'trends-feels-like': setIsWeatherTrendFeelsLikeVisible
+    }), []);
+
+    const hideAllWeatherViews = useCallback(() => {
+        setIsCurrentWeatherVisible(false);
+        setIsTodayWeatherVisible(false);
+        setIsTomorrowWeatherVisible(false);
+        setIs3DayWeatherVisible(false);
+        setIs7DayWeatherVisible(false);
+    })
+
+    const hideAllWeatherTrendViews = useCallback(() => {
+        setIsWeatherTrendPrecipitationVisible(false);
+        setIsWeatherTrendTempVisible(false);
+        setIsWeatherTrendHumidityVisible(false);
+        setIsWeatherTrendFeelsLikeVisible(false);
+        setIsWeatherTrendsSelectorVisible(false);
+        setIsWeatherTrendsVisible(false);
+    })
+
+    const toggleWeatherTrendView = useCallback((weatherTrendView) => {
+        hideAllWeatherViews();
+
+        if (Object.hasOwn(weatherTrendMap, weatherTrendView)) {
+            weatherTrendMap[currentWeatherTrendView](false);
+            weatherTrendMap[weatherTrendView](true);
+            setCurrentWeatherTrendView(weatherTrendView);
+        } else {
+            throw new Error(`Weather trend view map doesn't have view '${weatherTrendView}'`);
+        }
+    }, [currentWeatherTrendView, hideAllWeatherViews, weatherTrendMap])
+
     const toggleWeatherView = useCallback((weatherView) => {
+        hideAllWeatherTrendViews();
+
         if (Object.hasOwn(weatherViewMap, weatherView)) {
             // Toggle off current view
             weatherViewMap[currentWeatherView](false);
             weatherViewMap[weatherView](true);
             setCurrentWeatherView(weatherView);
+
+            if (weatherView === 'trends') {
+                // Extra toggles required for the trends view
+                setIsWeatherViewSelectorVisible(false);
+                setIsWeatherTrendsSelectorVisible(true);
+                setIsWeatherTrendPrecipitationVisible(true);
+            }
         } else {
             throw new Error(`Weather view map doesn't have view '${weatherView}'`);
         }
-    }, [weatherViewMap, currentWeatherView]);
+    }, [hideAllWeatherTrendViews, weatherViewMap, currentWeatherView]);
 
     const hideAll = useCallback(() => {
         setIsLoginPageVisible(false);
@@ -49,6 +108,9 @@ export function UIProvider({ children }) {
         setIsTomorrowWeatherVisible(false);
         setIs3DayWeatherVisible(false);
         setIs7DayWeatherVisible(false);
+        setIsWeatherTrendsVisible(false);
+        setIsWeatherViewSelectorVisible(false);
+        setIsWeatherTrendsSelectorVisible(false);
     })
 
     const showUserSelect = useCallback(() => {
@@ -76,9 +138,18 @@ export function UIProvider({ children }) {
             isTomorrowWeatherVisible, setIsTomorrowWeatherVisible,
             is3DayWeatherVisible, setIs3DayWeatherVisible,
             is7DayWeatherVisible, setIs7DayWeatherVisible,
+            isWeatherTrendsVisible, setIsWeatherTrendsVisible,
+            isWeatherViewSelectorVisible, setIsWeatherViewSelectorVisible,
+            isWeatherTrendsSelectorVisible, setIsWeatherTrendsSelectorVisible,
+            isWeatherTrendPrecipitationVisible, setIsWeatherTrendPrecipitationVisible,
+            isWeatherTrendTempVisible, setIsWeatherTrendTempVisible,
+            isWeatherTrendHumidityVisible, setIsWeatherTrendHumidityVisible,
+            isWeatherTrendFeelsLikeVisible, setIsWeatherTrendFeelsLikeVisible,
             friendlyName, setFriendlyName,
             uiActions, toggleWeatherView,
-            currentWeatherView
+            currentWeatherView, toggleWeatherTrendView,
+            currentWeatherTrendView, hideAllWeatherTrendViews,
+            setCurrentWeatherView
         }}>
             {children}
         </UIContext.Provider>

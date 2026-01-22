@@ -1,5 +1,5 @@
 #weather-container {
-    height: 920px;
+    height: 800px;
     position: relative;
 }
 
@@ -7,18 +7,59 @@
     position: absolute;
     inset: 0;
     opacity: 1;
-    overflow: hidden;
+    overflow-y: scroll;
     transition:
         opacity 500ms ease-in-out,
         max-height 500ms ease-in-out;
 }
 
-.weather-panel.is-hiding {
+.smooth-opacity {
+    transition: opacity 500ms ease-in-out;
+}
+
+#weather-trends-inner-container {
+    position: relative;
+    height: 340px;
+}
+
+#weather-trends-btn-container {
+    position: relative;
+}
+
+.weather-trend-panel {
+    position: absolute;
+    inset: 0;
+    opacity: 1;
+    transition: opacity 500ms ease-in-out;
+    height: 300px;
+}
+
+.is-hiding {
     opacity: 0;
     pointer-events: none;
 }
 
-.weather-panel.is-collapsed {
+.is-collapsed {
     max-height: 0;
     visibility: hidden;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0;
+    overflow: hidden;
+    /*display: none !important;*/
 }
+
+#weather-selectors-outer {
+    position: relative;
+    width: 95%;
+    margin: 25px auto 0;
+    height: 220px;
+}
+
+/*#weather-view-outer-container,*/
+/*#weather-trends-selector-outer {*/
+/*    position: absolute;*/
+/*    inset: 0;*/
+/*    box-sizing: border-box;*/
+/*    pointer-events: none;*/
+/*}*/

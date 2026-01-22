@@ -9,6 +9,9 @@ import '/src/css/weather.css';
 import TomorrowWeather from "./TomorrowWeather.jsx";
 import ThreeDayWeather from "./ThreeDayWeather.jsx";
 import SevenDayWeather from "./SevenDayWeather.jsx";
+import WeatherTrends from "./WeatherTrends.jsx";
+import WeatherTrendsSelector from "./WeatherTrendsSelector.jsx";
+import WeatherTrendViewBtn from "./WeatherTrendViewBtn.jsx";
 
 
 function WeatherView() {
@@ -42,11 +45,21 @@ function WeatherView() {
                 <SevenDayWeather
 
                 />
+
+                <WeatherTrends
+
+                />
             </div>
 
-            <WeatherViewSelector
+            <div id={'weather-selectors-outer'} className={'smooth-opacity'}>
+                <WeatherViewSelector
 
-            />
+                />
+
+                <WeatherTrendsSelector
+
+                />
+            </div>
         </>
     )
 }

@@ -77,7 +77,7 @@ function CurrentWeather() {
                 setHumidity(resp.nwsHourlyPeriod.humidityStr);
                 setProbOfPrecip(resp.nwsHourlyPeriod.probOfPrecipStr);
             })
-    }, []);
+    }, [isCurrentWeatherVisible]);
 
     return <>
         <div id={'current-weather-container'} className={className}>

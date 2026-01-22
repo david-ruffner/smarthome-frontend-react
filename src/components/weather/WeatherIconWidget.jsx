@@ -281,9 +281,10 @@ function normalizeForecastKey(str) {
     }
 }
 
-function WeatherIconWidget({ shortForecast, mapType="black" }) {
+function WeatherIconWidget({ shortForecast, mapType="black",
+                           customClass = '' }) {
     return <>
-        <img className="dashboard-weather-icon" src={getWeatherIcon({
+        <img className={`dashboard-weather-icon ${customClass !== '' ? customClass : ''}`} src={getWeatherIcon({
             shortForecast: normalizeForecastKey(shortForecast),
             mapType: mapType
         })} alt="Weather Icon"/>

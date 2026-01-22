@@ -1,17 +1,31 @@
 import WeatherViewBtn from "./WeatherViewBtn.jsx";
+import {useUI} from "../../context/UIContext.jsx";
+import {useCollapseTransition} from "../../utils/ui.jsx";
+// import {CustomStyle} from "../../utils/CustomStyle.js";
 
 
 function WeatherViewSelector() {
 
+    const {
+        isWeatherViewSelectorVisible
+    } = useUI();
+    const isCollapsed = useCollapseTransition(isWeatherViewSelectorVisible, 500);
+
+    const className = [
+        'frosted-glass',
+        !isWeatherViewSelectorVisible ? 'is-hiding' : '',
+        isCollapsed ? 'is-collapsed' : ''
+    ].filter(Boolean).join(' ');
+
     return <>
         <style>{`
             #weather-view-outer-container {
-                margin-top: 25px;
-                width: 95%;
-                justify-self: center;
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                grid-template-rows: repeat(2, auto);
+                position: absolute;
+                  inset: 0;               /* fill the overlay wrapper */
+                  display: grid;
+                  grid-template-columns: repeat(3, 1fr);
+                  grid-template-rows: repeat(2, auto);
+                  z-index: 1;
             }
             
             .weather-view-btn {
@@ -56,7 +70,7 @@ function WeatherViewSelector() {
             }
         `}</style>
 
-        <div className={'frosted-glass'} id={'weather-view-outer-container'}>
+        <div className={className} id={'weather-view-outer-container'}>
             <WeatherViewBtn
                 name={'Current'}
                 weatherView={'current'}
@@ -72,6 +86,15 @@ function WeatherViewSelector() {
             <WeatherViewBtn
                 name={'3 Day'}
                 weatherView={'3-day'}
+            />
+            <WeatherViewBtn
+                name={'Trends'}
+                weatherView={'trends'}
+                customStyles={{
+                    background: 'rgba(109, 176, 255, 0.65)',
+                    gridRow: 2,
+                    gridColumn: 2
+                }}
             />
             <WeatherViewBtn
                 name={'7 Day'}

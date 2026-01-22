@@ -1,6 +1,6 @@
 import {useUI} from "../../context/UIContext.jsx";
 
-function WeatherViewBtn({ name, weatherView }) {
+function WeatherViewBtn({ name, weatherView, customStyles }) {
 
     const {
         toggleWeatherView, currentWeatherView
@@ -16,7 +16,7 @@ function WeatherViewBtn({ name, weatherView }) {
 
     return <>
         <button onClick={onClick} className={`weather-view-btn ${isActive() ? 'active-weather-view-btn' : ''}`}
-                data-weather-view={weatherView}>
+                data-weather-view={weatherView} style={customStyles}>
             <h1>{name}</h1>
         </button>
     </>
