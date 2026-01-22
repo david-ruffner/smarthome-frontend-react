@@ -1,0 +1,22 @@
+#notify-container {
+    position: fixed;
+    top: -20px;
+    right: 110px;
+    padding: 15px;
+
+    width: 500px;
+    z-index: 30;
+
+    /* Start hidden above viewport */
+    transform: translateY(-120%);
+    opacity: 0;
+
+    transition:
+            transform 300ms ease-out,
+            opacity 200ms ease-out;
+}
+
+#notify-container.is-visible {
+    transform: translateY(20px);
+    opacity: 1;
+}
