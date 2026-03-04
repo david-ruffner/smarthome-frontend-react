@@ -9,6 +9,8 @@ import TodoistLabelModal from "../components/todoist/TodoistLabelModal.jsx";
 import TodoistTaskEditModal from "../components/todoist/TodoistTaskEditModal.jsx";
 import AppTray from "../components/AppTray.jsx";
 import AppTrayModal from "../components/AppTrayModal.jsx";
+import LightsView from "../views/LightsView.jsx";
+import ModifyLightModal from "../components/lights/ModifyLightModal.jsx";
 
 function Dashboard() {
 
@@ -112,6 +114,7 @@ function Dashboard() {
             <div id={'dashboard-container'} style={{overflowY: lockDashboard ? 'hidden' : 'scroll'}} className={isDashboardVisible ? 'is-visible' : ''}>
                 <TodoistLabelModal />
                 <AppTrayModal />
+                <ModifyLightModal />
                 {/*<TodoistTaskEditModal />*/}
 
                 <div id={'navbar-container'} className={`frosted-glass`}>
@@ -134,7 +137,7 @@ function Dashboard() {
                                 />
                             </div>
                             <div data-index={1} id={'lights-parent'} className={`parent-card ${isLightsViewVisible ? 'is-visible' : 'is-hidden'}`}>
-                                <h1>Lights</h1>
+                                <LightsView />
                             </div>
                         </div>
                     </div>

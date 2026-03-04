@@ -4,11 +4,14 @@ import './css/index.css'
 import App from './App.jsx'
 import {UIProvider} from "./context/UIContext.jsx";
 import {TodoistCtxProvider} from "./context/TodoistContext.jsx";
+import {LightsUIProvider} from "./components/lights/LightsUIContext.jsx";
 
 createRoot(document.getElementById('root')).render(
     <UIProvider>
         <TodoistCtxProvider>
-            <App />
+            <LightsUIProvider>
+                <App />
+            </LightsUIProvider>
         </TodoistCtxProvider>
     </UIProvider>,
 )

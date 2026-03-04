@@ -171,3 +171,9 @@ export function processTodoistDueDate(due, duration) {
 
     return retVal;
 }
+
+const FG_LIGHTNESS_THRESHOLD = 170;
+
+export function determineFGLightness(red, green, blue) {
+    return (red > 170 || green > 170 || blue > 170) ? 'black' : 'white';
+}
