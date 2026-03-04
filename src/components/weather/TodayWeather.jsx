@@ -3,7 +3,7 @@ import {useCollapseTransition} from "../../utils/ui.jsx";
 import HourlyWeatherPanel from "./HourlyWeatherPanel.jsx";
 import {useEffect, useState} from "react";
 import {BACKEND_HOST} from "../Constants.jsx";
-import {fetchToken, getTimeFor24Hr} from "../../utils/Utils.js";
+import {fetchToken, getTimeFor24Hr, logErr} from "../../utils/Utils.js";
 import {notify} from "../../services/NotificationService.jsx";
 
 
@@ -14,6 +14,7 @@ function TodayWeather() {
     } = useUI();
     const isCollapsed = useCollapseTransition(isTodayWeatherVisible, 500);
     const [ hourlyForecast, setHourlyForecast ] = useState([]);
+    const [ errMsg, setErrMsg ] = useState('');
 
     const className = [
         'weather-panel',
@@ -33,20 +34,36 @@ function TodayWeather() {
         if (!resp.ok) {
             notify("There was a problem fetching today's forecast. Please see the console.");
             let err = await resp.body;
-            console.log(`Error Fetching Today's Forecast: ${err}`);
+            logErr({
+                errMsg: `Error Fetching Today's Forecast: ${err}`,
+                fileName: 'TodayWeather.jsx',
+                lineNumber: '37'
+            })
 
             return;
         }
 
         let data = await resp.json();
+
+        if (data.errCode) {
+            switch (data.errCode) {
+                case 'FORECAST_EXHAUSTED':
+                    setErrMsg('There are no more daytime forecasts for today');
+                    break;
+            }
+
+            return;
+        }
+
         setHourlyForecast(data.daytimePeriods);
-        console.log(data); // TODO: Remove
     }
 
     useEffect(() => {
         // Fetch today's weather forecast
-        processTodaysForecast();
-    }, []);
+        if (isTodayWeatherVisible) {
+            processTodaysForecast();
+        }
+    }, [isTodayWeatherVisible]);
 
     return <>
         <style>{`
@@ -56,10 +73,23 @@ function TodayWeather() {
                 margin-top: 25px;
                 padding: 15px;
             }
+            
+            .panel-err-msg {
+                margin: 50px 35px 0 35px;
+                padding: 15px;
+                font-size: 28pt;
+                color: rgba(255, 0, 0, 0.6);
+                font-weight: 500;
+                will-change: opacity;
+                transition: opacity 500ms ease-in-out;
+            }
         `}</style>
 
         <div id={'today-weather-container'} className={className}>
             <h1 className={'frosted-glass'}>Today's Forecast</h1>
+
+            <h2 className={`frosted-glass panel-err-msg ${errMsg 
+            && errMsg !== '' ? '' : 'ui-disabled'}`}>{errMsg}</h2>
 
             {Array.isArray(hourlyForecast) &&
                 hourlyForecast.map((period, index) => (

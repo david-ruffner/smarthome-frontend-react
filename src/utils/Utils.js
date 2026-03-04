@@ -4,22 +4,45 @@ export function isStrEmpty(str) {
     return (str === null || str === undefined || str === '');
 }
 
+export function isObjEmpty(obj) {
+    return (obj === null || obj === undefined);
+}
+
+export function isArrayEmpty(arr) {
+    return arr == null || !Array.isArray(arr) || arr.length === 0;
+}
+
+export function areAnyObjValsEmpty(obj) {
+    if (obj == null || typeof obj !== "object") return true;
+
+    return Object.values(obj).some(v => v == null);
+}
+
+export function getCurrentDashboardScrollTop() {
+    return document.querySelector('#dashboard-container')?.scrollTop;
+}
+
 export function logErr({
-                           errMsg,
-                           header = "ERROR",
-                           data = null
-                       } = {}) {
-    console.log(`${header} | ${new Date().toLocaleTimeString()} | ${errMsg}`);
-    if (data !== null) {
-        console.log(data);
-    }
+   errMsg,
+   header = "ERROR",
+   data = null,
+   fileName = null,
+   lineNumber = null
+} = {}) {
+    let dataStr = !isObjEmpty(data) ? " | Data: " + JSON.stringify(data) : "";
+    let fileAndLineStr = (!isStrEmpty(fileName) && !isStrEmpty(lineNumber)) ? ` | File And Line: ${fileName}:${lineNumber}` : '';
+    console.log(`${header} | ${new Date().toLocaleTimeString()} | ${errMsg}${fileAndLineStr}${dataStr}`);
 }
 
 export function fetchToken() {
     let token = localStorage.getItem('token');
 
     if (isStrEmpty(token)) {
-        logErr({errMsg: 'token was not found in session storage'});
+        logErr({
+            errMsg: 'token was not found in session storage',
+            fileName: 'Utils.js',
+            lineNumber: '27'
+        });
         return null;
     }
 
@@ -53,7 +76,9 @@ export function getTimeFor24Hr({
         const d = new Date(time);
         if (Number.isNaN(d.getTime())) {
             logErr({
-                errMsg: "Invalid timestamp"
+                errMsg: "Invalid timestamp",
+                fileName: 'Utils.js',
+                lineNumber: '64'
             })
         } else {
             return d.getHours();
@@ -72,4 +97,77 @@ export function getTimeFor24Hr({
             hour12: true
         });
     }
+}
+
+export function addMinutesToDT(dateTime, minutes) {
+    return new Date(dateTime.getTime() + (minutes * 60_000));
+}
+
+export function addHoursToDT(dateTime, hours) {
+    return new Date(dateTime.getTime() + (hours * 3_600_000));
+}
+
+/**
+ *
+ * @param due
+ * 'due' should have:
+ * {
+ *     date: '2026-02-04T03:00:00'
+ * }
+ *
+ * @param duration
+ * 'duration' should look like:
+ * {
+ *     amount: 120
+ * }
+ */
+export function processTodoistDueDate(due, duration) {
+    if (isObjEmpty(due) || isStrEmpty(due?.date)) {
+        let errMsg = 'Tried to call processTodoistDueDate() with malformed \'due\' object.' +
+            " Please see the function's description in Utils.js";
+        logErr({
+            errMsg: errMsg,
+            fileName: 'Utils.js',
+            lineNumber: '118'
+        });
+        throw new Error(errMsg);
+    }
+
+    let retVal = {
+        dueDateFullStr: due.date,
+        dueDateStr: null,
+        dueDateTimeStr: null,
+        durationStr: null,
+        durationHours: 0,
+        durationMinutes: 0,
+        dueDateTimeStart: null,
+        dueDateTimeEnd: null
+    }
+
+    if (due.date.includes("T")) {
+        retVal.dueDateStr = due.date.split("T")[0].trim();
+        retVal.dueDateTimeStr = due.date.split("T")[1].trim();
+    }
+
+    if (!isObjEmpty(duration?.amount) && duration.amount < 60) {
+        retVal.durationStr = `${duration.amount} Minutes`;
+        retVal.durationMinutes = duration.amount;
+        retVal.dueDateTimeStart = due.date;
+
+        let dt = new Date(due.date);
+        dt = addMinutesToDT(dt, retVal.durationMinutes);
+        retVal.dueDateTimeEnd = dt.toString();
+    } else if (!isObjEmpty(duration?.amount) && duration.amount >= 60) {
+        retVal.durationHours = Math.floor(duration.amount / 60);
+        retVal.durationMinutes = (duration.amount % 60);
+        retVal.durationStr = `${retVal.durationHours} Hours & ${retVal.durationMinutes} Minutes`;
+        retVal.dueDateTimeStart = due.date;
+
+        let dt = new Date(due.date);
+        dt = addMinutesToDT(dt, retVal.durationMinutes);
+        dt = addHoursToDT(dt, retVal.durationHours);
+        retVal.dueDateTimeEnd = dt.toString();
+    }
+
+    return retVal;
 }

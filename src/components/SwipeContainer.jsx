@@ -12,12 +12,10 @@ function SwipeContainer({ children }) {
 
     const handlers = useSwipeable({
         onSwipedLeft: () => {
-            console.log(`Swiped Left!`);
             // slideDashboardCarousel(currentDashboardIndex + 1);
             setNewDashboardIndex(currentDashboardIndex + 1);
         },
         onSwipedRight: () => {
-            console.log(`Swiped Right!`);
             // slideDashboardCarousel(currentDashboardIndex - 1)
             setNewDashboardIndex(currentDashboardIndex - 1);
         },

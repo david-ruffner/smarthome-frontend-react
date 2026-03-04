@@ -33,7 +33,7 @@ function WeatherView() {
                 }
             `}</style>
 
-            <div id={'weather-container'} className={`frosted-glass ${isWeatherViewVisible ? '' : 'ui-disabled'}`}>
+            <div id={'weather-container'} className={`frosted-glass`}>
                 <CurrentWeather
                     isCurrentWeatherVisible={isCurrentWeatherVisible}
                 />
@@ -59,7 +59,7 @@ function WeatherView() {
                 />
             </div>
 
-            <div id={'weather-selectors-outer'} className={'smooth-opacity'}>
+            <div id={'weather-selectors-outer'} className={`smooth-opacity ${isWeatherViewVisible ? 'is-visible' : 'is-hidden'}`}>
                 <WeatherViewSelector
 
                 />

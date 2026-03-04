@@ -2,7 +2,7 @@ import {useUI} from "../../../context/UIContext.jsx";
 import {useCollapseTransition} from "../../../utils/ui.jsx";
 import {useEffect, useState} from "react";
 import {BACKEND_HOST} from "../../Constants.jsx";
-import {fetchToken} from "../../../utils/Utils.js";
+import {fetchToken, logErr} from "../../../utils/Utils.js";
 import {notify} from "../../../services/NotificationService.jsx";
 import TemperatureWeatherChart from "./TemperatureWeatherChart.jsx";
 import {TrendColor} from "../../../utils/TrendColor.js";
@@ -39,7 +39,11 @@ function TemperatureWeatherTrend({ setActiveTrendBtnColor, trendType,
         if (!res.ok) {
             notify("There was a problem fetching temperature data. Please see the console.");
             const err = await res.json();
-            console.log(`Error while fetching temperature data: ${JSON.stringify(err)}`);
+            logErr({
+                errMsg: `Error while fetching temperature data: ${JSON.stringify(err)}`,
+                fileName: 'TemperatureWeatherTrend',
+                lineNumber: '42'
+            })
         }
 
         const data = await res.json();

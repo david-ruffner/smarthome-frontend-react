@@ -3,7 +3,7 @@ import {useCollapseTransition} from "../../utils/ui.jsx";
 import CurrentWeatherBodyValue from "./CurrentWeatherBodyValue.jsx";
 import {useEffect, useState} from "react";
 import {BACKEND_HOST} from "../Constants.jsx";
-import {fetchToken} from "../../utils/Utils.js";
+import {fetchToken, logErr} from "../../utils/Utils.js";
 import {notify} from "../../services/NotificationService.jsx";
 
 
@@ -34,7 +34,11 @@ function ThreeDayWeather() {
         if (!resp.ok) {
             notify("There was a problem fetching the 3-Day forecast. Please see the console.");
             let err = await resp.body;
-            console.log(`Error Fetching The 3-Day Forecast: ${err}`);
+            logErr({
+                errMsg: `Error Fetching The 3-Day Forecast: ${err}`,
+                fileName: 'ThreeDayWeather.jsx',
+                lineNumber: '37'
+            })
 
             return;
         }

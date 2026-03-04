@@ -1,6 +1,6 @@
 import '/src/css/components/CurrentWeather.css'
 import {useUI} from "../../context/UIContext.jsx";
-import {fetchToken} from "../../utils/Utils.js";
+import {fetchToken, isStrEmpty, logErr} from "../../utils/Utils.js";
 import {BACKEND_HOST} from "../Constants.jsx";
 import {notify} from "../../services/NotificationService.jsx";
 import {useEffect, useState} from "react";
@@ -33,7 +33,11 @@ async function fetchCurrentWeather(isCurrentWeatherVisible, uiActions) {
     if (!res.ok) {
         notify("There was a problem getting weather data. Please log in again.");
         const err = await res.body;
-        console.log(`Error while fetching current weather data: ${err}`);
+        logErr({
+            errMsg: `Error while fetching current weather data: ${err}`,
+            fileName: 'CurrentWeather.jsx',
+            lineNumber: '36'
+        })
 
         uiActions.hideAll();
         uiActions.showUserSelect();
@@ -67,7 +71,6 @@ function CurrentWeather() {
     useEffect(() => {
         fetchCurrentWeather(isCurrentWeatherVisible, uiActions)
             .then(resp => {
-                console.log(resp);
                 setCityStr(resp.locationStr);
                 setWindDirection(resp.nwsHourlyPeriod.windDirection);
                 setShortForecast(resp.nwsHourlyPeriod.shortForecast);
@@ -78,6 +81,11 @@ function CurrentWeather() {
                 setProbOfPrecip(resp.nwsHourlyPeriod.probOfPrecipStr);
             })
     }, [isCurrentWeatherVisible]);
+
+    // shortForecast must be present before DOM can load
+    if (isStrEmpty(shortForecast)) {
+        return null;
+    }
 
     return <>
         <div id={'current-weather-container'} className={className}>

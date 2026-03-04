@@ -4,14 +4,19 @@ import {useUI} from "../context/UIContext.jsx";
 import {useEffect, useState} from "react";
 import SwipeContainer from "../components/SwipeContainer.jsx";
 import DashboardTrolley from "../components/DashboardTrolley.jsx";
+import TodoistView from "../views/TodoistView.jsx";
+import TodoistLabelModal from "../components/todoist/TodoistLabelModal.jsx";
+import TodoistTaskEditModal from "../components/todoist/TodoistTaskEditModal.jsx";
+import AppTray from "../components/AppTray.jsx";
+import AppTrayModal from "../components/AppTrayModal.jsx";
 
 function Dashboard() {
 
     const {
-        isDashboardVisible, setIsDashboardVisible,
+        isDashboardVisible,
         friendlyName, isWeatherViewVisible,
-        setIsWeatherViewVisible, currentDashboardIndex,
-        dashboardOffset, slideDashboardCarousel
+        lockDashboard,
+        isLightsViewVisible
     } = useUI();
 
     // TODO: Remove
@@ -26,6 +31,27 @@ function Dashboard() {
     return (
         <>
             <style>{`                
+                #dashboard-stack {
+                  display: grid;
+                  grid-template-columns: 1fr;
+                  grid-template-rows: 1fr;
+                
+                  width: 100%;
+                  height: 100%;
+                
+                  position: relative;
+                }
+                
+                .dashboard-layer {
+                  grid-column: 1 / 2;
+                  grid-row: 1 / 2;
+                
+                  width: 100%;
+                  height: 100%;
+                
+                  position: relative;
+                }
+            
                 #dashboard-container {
                     width: 720px;
                     max-width: 720px;
@@ -37,12 +63,14 @@ function Dashboard() {
                     opacity: 0;
                     pointer-events: none;
                     visibility: hidden;
+                    display: none;
                 }
             
                 #dashboard-container.is-visible {
                     pointer-events: auto;
                     opacity: 1;
                     visibility: visible;
+                    display: block;
                 }
                 
                 #navbar-container {
@@ -75,29 +103,37 @@ function Dashboard() {
                 .parent-card {
                     width: 720px;
                 }
+                
+                #todoist-parent {
+                    position: relative;
+                }
             `}</style>
 
-            <div id={'dashboard-container'} className={isDashboardVisible ? 'is-visible' : ''}>
+            <div id={'dashboard-container'} style={{overflowY: lockDashboard ? 'hidden' : 'scroll'}} className={isDashboardVisible ? 'is-visible' : ''}>
+                <TodoistLabelModal />
+                <AppTrayModal />
+                {/*<TodoistTaskEditModal />*/}
+
                 <div id={'navbar-container'} className={`frosted-glass`}>
                     <h1>Hi, {friendlyName}!</h1>
                 </div>
 
-                <DashboardTrolley />
+                {/*<DashboardTrolley />*/}
+
+                <AppTray />
 
                 <SwipeContainer>
                     <div className={'dashboard-viewport'}>
-                        <div id={'dashboard-carousel'} style={{
-                            transform: `translateX(${dashboardOffset}px)`
-                        }}>
-                            <div data-index={-1} id={'todoist-parent'} className={'parent-card'}>
-                                <h1>Todoist</h1>
+                        <div id={'dashboard-stack'}>
+                            <div data-index={-1} id={'todoist-parent'} className={`parent-card`}>
+                                <TodoistView />
                             </div>
-                            <div data-index={0} id={'weather-parent'} className={'parent-card'}>
+                            <div data-index={0} id={'weather-parent'} className={`parent-card ${isWeatherViewVisible ? 'is-visible' : 'is-hidden'}`}>
                                 <WeatherView
                                     isWeatherViewVisible={isWeatherViewVisible}
                                 />
                             </div>
-                            <div data-index={1} id={'lights-parent'} className={'parent-card'}>
+                            <div data-index={1} id={'lights-parent'} className={`parent-card ${isLightsViewVisible ? 'is-visible' : 'is-hidden'}`}>
                                 <h1>Lights</h1>
                             </div>
                         </div>

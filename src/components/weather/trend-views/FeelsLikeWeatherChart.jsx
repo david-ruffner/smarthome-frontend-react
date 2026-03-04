@@ -3,10 +3,6 @@ import Chart from 'react-apexcharts';
 
 
 function FeelsLikeWeatherChart({ feelsLikeValues, timeValues, lineColor }) {
-
-    console.log("Feels Like Values");
-    console.log(feelsLikeValues);
-
     const series = useMemo(() => ([
         {
             name: "Feels Like",

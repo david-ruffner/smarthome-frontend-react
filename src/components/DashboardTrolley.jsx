@@ -28,7 +28,6 @@ function DashboardTrolley() {
     }
 
     useEffect(() => {
-        console.log(`Trolley Current Index: ${currentDashboardIndex}`);
         swapActiveTrolleyCircle();
     }, [currentDashboardIndex]);
 
