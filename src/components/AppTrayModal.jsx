@@ -8,7 +8,7 @@ function AppTrayModal() {
         isAppTrayOpen, setIsAppTrayOpen,
         setLockDashboard,
         setIsWeatherViewVisible, setIsTodoistViewVisible,
-        setIsLightsViewVisible
+        setIsLightsViewVisible, setIsCalendarViewVisible
     } = useUI();
 
     if (isAppTrayOpen) {
@@ -75,6 +75,7 @@ function AppTrayModal() {
             <AppTrayIcon
                 imgSrc={'/src/assets/images/appTray/calendar-app-tray-icon-white.png'}
                 name={'Calendar'}
+                visibilitySetter={setIsCalendarViewVisible}
             />
 
             <AppTrayIcon

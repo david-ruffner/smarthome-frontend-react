@@ -11,6 +11,7 @@ import AppTray from "../components/AppTray.jsx";
 import AppTrayModal from "../components/AppTrayModal.jsx";
 import LightsView from "../views/LightsView.jsx";
 import ModifyLightModal from "../components/lights/ModifyLightModal.jsx";
+import CalendarView from "../views/CalendarView.jsx";
 
 function Dashboard() {
 
@@ -18,7 +19,9 @@ function Dashboard() {
         isDashboardVisible,
         friendlyName, isWeatherViewVisible,
         lockDashboard,
-        isLightsViewVisible
+        isLightsViewVisible,
+        isTodoistViewVisible,
+        isCalendarViewVisible
     } = useUI();
 
     // TODO: Remove
@@ -128,16 +131,19 @@ function Dashboard() {
                 <SwipeContainer>
                     <div className={'dashboard-viewport'}>
                         <div id={'dashboard-stack'}>
-                            <div data-index={-1} id={'todoist-parent'} className={`parent-card`}>
+                            <div data-index={-1} style={{gridRow: 1, gridColumn: 1}} id={'todoist-parent'} className={`parent-card ${isTodoistViewVisible ? 'is-visible' : 'is-hidden'}`}>
                                 <TodoistView />
                             </div>
-                            <div data-index={0} id={'weather-parent'} className={`parent-card ${isWeatherViewVisible ? 'is-visible' : 'is-hidden'}`}>
+                            <div data-index={0} id={'weather-parent'} style={{gridRow: 1, gridColumn: 1}} className={`parent-card ${isWeatherViewVisible ? 'is-visible' : 'is-hidden'}`}>
                                 <WeatherView
                                     isWeatherViewVisible={isWeatherViewVisible}
                                 />
                             </div>
-                            <div data-index={1} id={'lights-parent'} className={`parent-card ${isLightsViewVisible ? 'is-visible' : 'is-hidden'}`}>
+                            <div data-index={1} id={'lights-parent'} style={{gridRow: 1, gridColumn: 1}} className={`parent-card ${isLightsViewVisible ? 'is-visible' : 'is-hidden'}`}>
                                 <LightsView />
+                            </div>
+                            <div id={'calendar-parent'} style={{gridRow: 1, gridColumn: 1}} className={`parent-card ${isCalendarViewVisible ? 'is-visible' : 'is-hidden'}`}>
+                                <CalendarView />
                             </div>
                         </div>
                     </div>

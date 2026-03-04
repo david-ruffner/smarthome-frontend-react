@@ -11,7 +11,8 @@ export function UIProvider({ children }) {
     // View Visibility
     const [ isWeatherViewVisible, setIsWeatherViewVisible ] = useState(false);
     const [ isTodoistViewVisible, setIsTodoistViewVisible ] = useState(false);
-    const [ isLightsViewVisible, setIsLightsViewVisible ] = useState(true);
+    const [ isLightsViewVisible, setIsLightsViewVisible ] = useState(false);
+    const [ isCalendarViewVisible, setIsCalendarViewVisible ] = useState(true);
 
     const [ friendlyName, setFriendlyName ] = useState('');
 
@@ -179,6 +180,7 @@ export function UIProvider({ children }) {
         setIsWeatherViewVisible(false);
         setIsTodoistViewVisible(false);
         setIsLightsViewVisible(false);
+        setIsCalendarViewVisible(false);
     }, [])
 
     const showUserSelect = useCallback(() => {
@@ -231,7 +233,8 @@ export function UIProvider({ children }) {
             hideAll, hidePanels,
             isTodoistViewVisible, setIsTodoistViewVisible,
             isLightsViewVisible, setIsLightsViewVisible,
-            isModifyLightOpen, setIsModifyLightOpen
+            isModifyLightOpen, setIsModifyLightOpen,
+            isCalendarViewVisible, setIsCalendarViewVisible
         }}>
             {children}
         </UIContext.Provider>

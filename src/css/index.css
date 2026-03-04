@@ -225,7 +225,6 @@ button:focus-visible {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    display: none;
 }
 
 /* Used to center elements on the x-axis that are positioned absolutely */
