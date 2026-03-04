@@ -2,7 +2,7 @@ import '/src/css/components/Numpad.css'
 import {useEffect, useState} from "react";
 import {BACKEND_HOST} from "./Constants.jsx";
 import {notify} from "../services/NotificationService.jsx";
-import {isStrEmpty} from "../utils/Utils.js";
+import {isStrEmpty, logErr} from "../utils/Utils.js";
 import {useUI} from "../context/UIContext.jsx";
 
 function Numpad() {
@@ -17,7 +17,6 @@ function Numpad() {
     const [ inErrState, setInErrState ] = useState(false);
 
     function onNumpadValUpdate(numpadVal) {
-        console.log(`Numpad Val: ${numpadVal}`);
         if (numpadVal.length === 4) {
             userLogin(numpadVal)
                 .then((data) => {
@@ -49,15 +48,17 @@ function Numpad() {
         if (!res.ok) {
             notify("There was a problem logging in. Please see the console.");
             const err = await res.json();
-            console.log(`Error while logging in: ${JSON.stringify(err)}`);
+            logErr({
+                errMsg: `Error while logging in: ${JSON.stringify(err)}`,
+                fileName: 'Numpad.jsx',
+                lineNumber: '51'
+            })
         }
 
         return await res.json();
     }
 
     function handleLoginData(data) {
-        console.log(data);
-
         switch (data.shortCode) {
             case "NON_EXISTENT_USER":
                 // Incorrect PIN
@@ -66,7 +67,6 @@ function Numpad() {
                 break;
 
             case "SUCCESS":
-                console.log(`Login Successful!`);
                 setIsLoginPageVisible(false);
                 setIsDashboardVisible(true);
                 setFriendlyName(data.name);

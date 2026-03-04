@@ -2,7 +2,7 @@ import {useUI} from "../../context/UIContext.jsx";
 import {useCollapseTransition} from "../../utils/ui.jsx";
 import {useEffect, useState} from "react";
 import {BACKEND_HOST} from "../Constants.jsx";
-import {fetchToken, getTimeFor24Hr} from "../../utils/Utils.js";
+import {fetchToken, getTimeFor24Hr, logErr} from "../../utils/Utils.js";
 import {notify} from "../../services/NotificationService.jsx";
 import HourlyWeatherPanel from "./HourlyWeatherPanel.jsx";
 
@@ -33,14 +33,17 @@ function TomorrowWeather() {
         if (!resp.ok) {
             notify("There was a problem fetching today's forecast. Please see the console.");
             let err = await resp.body;
-            console.log(`Error Fetching Today's Forecast: ${err}`);
+            logErr({
+                errMsg: `Error Fetching Today's Forecast: ${err}`,
+                fileName: 'TomorrowWeather.jsx',
+                lineNumber: '36'
+            })
 
             return;
         }
 
         let data = await resp.json();
         setHourlyForecast(data.allPeriods);
-        console.log(data); // TODO: Remove
     }
 
     useEffect(() => {

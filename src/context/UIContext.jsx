@@ -7,14 +7,26 @@ export function UIProvider({ children }) {
     const [ isDashboardVisible, setIsDashboardVisible ] = useState(false);
     const [ isNumpadVisible, setIsNumpadVisible ] = useState(false);
     const [ isUserSelectVisible, setIsUserSelectVisible ] = useState(false);
-    const [ isWeatherViewVisible, setIsWeatherViewVisible ] = useState(true); // TODO: Revert to false
+
+    // View Visibility
+    const [ isWeatherViewVisible, setIsWeatherViewVisible ] = useState(false);
+    const [ isTodoistViewVisible, setIsTodoistViewVisible ] = useState(false);
+    const [ isLightsViewVisible, setIsLightsViewVisible ] = useState(true);
+
     const [ friendlyName, setFriendlyName ] = useState('');
 
+    // App Tray
+    const [ isAppTrayOpen, setIsAppTrayOpen ] = useState(false); // TODO: Revert to false
+
+    function toggleAppTray() {
+        setIsAppTrayOpen(!isAppTrayOpen);
+    }
+
     // Weather views
-    const [ isCurrentWeatherVisible, setIsCurrentWeatherVisible ] = useState(false); // TODO: Revert to true
+    const [ isCurrentWeatherVisible, setIsCurrentWeatherVisible ] = useState(true); // TODO: Revert to true
     const [ isTodayWeatherVisible, setIsTodayWeatherVisible ] = useState(false);
     const [ isTomorrowWeatherVisible, setIsTomorrowWeatherVisible ] = useState(false);
-    const [ is3DayWeatherVisible, setIs3DayWeatherVisible ] = useState(true); // TODO: Revert to false
+    const [ is3DayWeatherVisible, setIs3DayWeatherVisible ] = useState(false); // TODO: Revert to false
     const [ is7DayWeatherVisible, setIs7DayWeatherVisible ] = useState(false);
     const [ isWeatherTrendsVisible, setIsWeatherTrendsVisible ] = useState(false);
     const [ currentWeatherView, setCurrentWeatherView ] = useState('current');
@@ -29,6 +41,16 @@ export function UIProvider({ children }) {
     const [ isWeatherTrendHumidityVisible, setIsWeatherTrendHumidityVisible ] = useState(false);
     const [ isWeatherTrendFeelsLikeVisible, setIsWeatherTrendFeelsLikeVisible ] = useState(false);
     const [ currentWeatherTrendView, setCurrentWeatherTrendView ] = useState('trends-precipitation');
+
+    // Todoist views
+    const [ isTodoistViewPanelVisible, setIsTodoistViewPanelVisible ] = useState(false);
+    const [ isTodoistSortPanelVisible, setIsTodoistSortPanelVisible ] = useState(false);
+    const [ todoistSortingOption, setTodoistSortingOption ] = useState('alphabetically');
+    const [ todoistDefaultProjectId, setTodoistDefaultProjectId ] = useState('');
+    const [ todoistPartitionKeys, setTodoistPartitionKeys ] = useState([]);
+
+    // Shared by all modals
+    const [ lockDashboard, setLockDashboard ] = useState(false);
 
     // Map weather view selectors to weather views
     const weatherViewMap = useMemo(() => ({
@@ -66,9 +88,9 @@ export function UIProvider({ children }) {
     })
 
     // Stuff for the dashboard carousel
-    const [ currentDashboardIndex, setCurrentDashboardIndex ] = useState(0);
+    const [ currentDashboardIndex, setCurrentDashboardIndex ] = useState(-1); // TODO: Revert to 0
     const [ newDashboardIndex, setNewDashboardIndex ] = useState(0);
-    const [ dashboardOffset, setDashboardOffset ] = useState(-750);
+    const [ dashboardOffset, setDashboardOffset ] = useState(0); // TODO: Revert to -750
     const [ minDashboardIndex ] = useState(-1); // Has to be manually set here
     const [ maxDashboardIndex ] = useState(1); // Has to be manually set here
 
@@ -146,7 +168,15 @@ export function UIProvider({ children }) {
         setIsWeatherTrendsVisible(false);
         setIsWeatherViewSelectorVisible(false);
         setIsWeatherTrendsSelectorVisible(false);
-    })
+        setIsTodoistViewPanelVisible(false);
+        setIsTodoistSortPanelVisible(false);
+    }, [])
+
+    const hidePanels = useCallback(() => {
+        setIsWeatherViewVisible(false);
+        setIsTodoistViewVisible(false);
+        setIsLightsViewVisible(false);
+    }, [])
 
     const showUserSelect = useCallback(() => {
         setIsLoginPageVisible(true)
@@ -187,7 +217,17 @@ export function UIProvider({ children }) {
             setCurrentWeatherView, dashboardOffset,
             slideDashboardCarousel, currentDashboardIndex,
             setCurrentDashboardIndex, newDashboardIndex,
-            setNewDashboardIndex
+            setNewDashboardIndex,
+            isTodoistViewPanelVisible, setIsTodoistViewPanelVisible,
+            isTodoistSortPanelVisible, setIsTodoistSortPanelVisible,
+            todoistSortingOption, setTodoistSortingOption,
+            todoistDefaultProjectId, setTodoistDefaultProjectId,
+            todoistPartitionKeys, setTodoistPartitionKeys,
+            lockDashboard, setLockDashboard,
+            isAppTrayOpen, setIsAppTrayOpen, toggleAppTray,
+            hideAll, hidePanels,
+            isTodoistViewVisible, setIsTodoistViewVisible,
+            isLightsViewVisible, setIsLightsViewVisible
         }}>
             {children}
         </UIContext.Provider>

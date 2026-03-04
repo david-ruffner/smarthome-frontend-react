@@ -3,7 +3,7 @@ import {useCollapseTransition} from "../../../utils/ui.jsx";
 import PrecipitationWeatherChart from "./PrecipitationWeatherChart.jsx";
 import {useEffect, useState} from "react";
 import {BACKEND_HOST} from "../../Constants.jsx";
-import {fetchToken} from "../../../utils/Utils.js";
+import {fetchToken, logErr} from "../../../utils/Utils.js";
 import {notify} from "../../../services/NotificationService.jsx";
 import FeelsLikeWeatherChart from "./FeelsLikeWeatherChart.jsx";
 import {TrendColor} from "../../../utils/TrendColor.js";
@@ -39,11 +39,14 @@ function FeelsLikeWeatherTrend({ setActiveTrendBtnColor, trendType,
         if (!res.ok) {
             notify("There was a problem fetching feels like data. Please see the console.");
             const err = await res.json();
-            console.log(`Error while fetching feels like data: ${JSON.stringify(err)}`);
+            logErr({
+                errMsg: `Error while fetching feels like data: ${JSON.stringify(err)}`,
+                fileName: 'FeelsLikeWeatherTrend.jsx',
+                lineNumber: '42'
+            })
         }
 
         const data = await res.json();
-        console.log(data);
         const feelsLikePeriods = data.feelsLikePeriods;
         const feelsLikeValues = feelsLikePeriods.map(p => p.feelsLikeValue);
         const timeValues = feelsLikePeriods.map(p => p.twelveHourStartTime);

@@ -2,7 +2,7 @@ import {useUI} from "../../context/UIContext.jsx";
 import {useCollapseTransition} from "../../utils/ui.jsx";
 import {useEffect, useState} from "react";
 import {BACKEND_HOST} from "../Constants.jsx";
-import {fetchToken} from "../../utils/Utils.js";
+import {fetchToken, logErr} from "../../utils/Utils.js";
 import {notify} from "../../services/NotificationService.jsx";
 import CurrentWeatherBodyValue from "./CurrentWeatherBodyValue.jsx";
 
@@ -34,7 +34,11 @@ function SevenDayWeather() {
         if (!resp.ok) {
             notify("There was a problem fetching the 7-Day forecast. Please see the console.");
             let err = await resp.body;
-            console.log(`Error Fetching The 7-Day Forecast: ${err}`);
+            logErr({
+                errMsg: `Error Fetching The 7-Day Forecast: ${err}`,
+                fileName: 'SevenDayWeather.jsx',
+                lineNumber: '37'
+            })
 
             return;
         }

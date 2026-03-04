@@ -4,7 +4,7 @@ import NotificationHost from "./components/NotificationHost.jsx";
 import {useEffect} from "react";
 import Dashboard from "./pages/Dashboard.jsx";
 import {BACKEND_HOST} from "./components/Constants.jsx";
-import {isStrEmpty} from "./utils/Utils.js";
+import {isStrEmpty, logErr} from "./utils/Utils.js";
 import {notify} from "./services/NotificationService.jsx";
 import {useUI} from "./context/UIContext.jsx";
 
@@ -39,14 +39,17 @@ function App() {
        if (!resp.ok) {
            notify("There was a problem logging in. Please see the console.");
            let err = await resp.body;
-           console.log(`Login Error: ${err}`);
+           logErr({
+               errMsg: `Login Error: ${err}`,
+               fileName: 'App.jsx',
+               lineNumber: '42'
+           })
            setIsUserSelectVisible(true);
 
            return;
        }
 
         let data = await resp.json();
-        console.log(data); // TODO: Remove
         setFriendlyName(data.name);
         setIsLoginPageVisible(false);
         setIsDashboardVisible(true);

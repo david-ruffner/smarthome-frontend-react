@@ -2,7 +2,7 @@ import {useUI} from "../../../context/UIContext.jsx";
 import {useCollapseTransition} from "../../../utils/ui.jsx";
 import {useEffect, useState} from "react";
 import {BACKEND_HOST} from "../../Constants.jsx";
-import {fetchToken} from "../../../utils/Utils.js";
+import {fetchToken, logErr} from "../../../utils/Utils.js";
 import {notify} from "../../../services/NotificationService.jsx";
 import HumidityWeatherChart from "./HumidityWeatherChart.jsx";
 import {TrendColor} from "../../../utils/TrendColor.js";
@@ -38,7 +38,11 @@ function HumidityWeatherTrend({ setActiveTrendBtnColor, trendType,
         if (!res.ok) {
             notify("There was a problem fetching humidity data. Please see the console.");
             const err = await res.json();
-            console.log(`Error while fetching humidity data: ${JSON.stringify(err)}`);
+            logErr({
+                errMsg: `Error while fetching humidity data: ${JSON.stringify(err)}`,
+                fileName: 'HumidityWeatherTrend.jsx',
+                lineNumber: '41'
+            })
         }
 
         const data = await res.json();

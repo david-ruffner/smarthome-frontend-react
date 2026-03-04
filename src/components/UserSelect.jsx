@@ -3,6 +3,7 @@ import {useEffect, useState} from "react";
 import {BACKEND_HOST} from "./Constants.jsx";
 import {notify} from "../services/NotificationService.jsx";
 import {useUI} from "../context/UIContext.jsx";
+import {logErr} from "../utils/Utils.js";
 
 function User({ letter, name, username, onSelect, setIsUserSettingsVisible }) {
     function onUserClick(e) {
@@ -62,7 +63,11 @@ async function getUsers(hideAll, setIsUserSelectVisible) {
     if (!res.ok) {
         notify("There was a problem logging in. Please see the console.");
         const err = await res.body;
-        console.log(`Error while fetching users: ${err}`);
+        logErr({
+            errMsg: `Error while fetching users: ${err}`,
+            fileName: 'UserSelect.jsx',
+            lineNumber: '66'
+        })
 
         hideAll();
         setIsUserSelectVisible(true);
@@ -84,7 +89,6 @@ function UserSelect() {
     useEffect(() => {
         getUsers(hideAll, setIsUserSelectVisible)
             .then(data => {
-                console.log(data);
                 setUsers(data)
             })
     }, []);

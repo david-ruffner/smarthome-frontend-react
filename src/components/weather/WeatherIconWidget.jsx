@@ -236,21 +236,33 @@ function getWeatherIcon({
         if (Object.prototype.hasOwnProperty.call(shortForecastIconMapBlack, shortForecast.shortForecastKey)) {
             return shortForecastIconMapBlack[shortForecast.shortForecastKey];
         } else {
-            logErr({errMsg: `Couldn't find black weather icon for key '${shortForecast.shortForecastKey}'`})
+            logErr({
+                errMsg: `Couldn't find black weather icon for key '${shortForecast.shortForecastKey}'`,
+                fileName: 'WeatherIconWidget.jsx',
+                lineNumber: '239'
+            })
             return DEFAULT_BLACK_ICON;
         }
     } else if (mapType === 'blue') {
         if (Object.prototype.hasOwnProperty.call(shortForecastIconMapBlue, shortForecast.shortForecastKey)) {
             return shortForecastIconMapBlue[shortForecast.shortForecastKey];
         } else {
-            logErr({errMsg: `Couldn't find blue weather icon for key '${shortForecast.shortForecastKey}'`})
+            logErr({
+                errMsg: `Couldn't find blue weather icon for key '${shortForecast.shortForecastKey}'`,
+                fileName: 'WeatherIconWidget.jsx',
+                lineNumber: '250'
+            })
             return DEFAULT_BLUE_ICON;
         }
     } else if (mapType === 'white') {
         if (Object.prototype.hasOwnProperty.call(shortForecastIconMapWhite, shortForecast.shortForecastKey)) {
             return shortForecastIconMapWhite[shortForecast.shortForecastKey];
         } else {
-            logErr({errMsg: `Couldn't find white weather icon for key '${shortForecast.shortForecastKey}'`})
+            logErr({
+                errMsg: `Couldn't find white weather icon for key '${shortForecast.shortForecastKey}'`,
+                fileName: 'WeatherIconWidget.jsx',
+                lineNumber: '261'
+            })
             return DEFAULT_WHITE_ICON;
         }
     }

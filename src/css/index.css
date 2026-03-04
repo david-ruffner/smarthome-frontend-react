@@ -14,9 +14,11 @@ body {
     --background-gray: #242424;
     --btn-green: #6FC03F;
     --btn-light-blue: #3793ff;
+    --electric-blue: #74bfff;
     --btn-soft-cyan: #a9fff7;
     --btn-blush-rose: #da667b;
     --err-state-red: rgba(255, 0, 0, 0.75);
+
 
     font-family: Roboto, sans-serif;
     line-height: 1.5;
@@ -92,6 +94,36 @@ body {
     height: fit-content;
 }
 
+.frosted-glass-red {
+    background: rgba(255, 0, 0, 0.55); /* translucent white */
+    backdrop-filter: blur(10px);          /* creates the frosted look */
+    -webkit-backdrop-filter: blur(10px);  /* for Safari support */
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    height: fit-content;
+}
+
+.frosted-glass-dark-gray {
+    background: rgba(36, 36, 36, 0.65); /* translucent white */
+    backdrop-filter: blur(10px);          /* creates the frosted look */
+    -webkit-backdrop-filter: blur(10px);  /* for Safari support */
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    height: fit-content;
+}
+
+/* Used when we want to programatically change the background color, but keep the frosted glass look. */
+.frosted-glass-no-bg {
+    backdrop-filter: blur(10px);          /* creates the frosted look */
+    -webkit-backdrop-filter: blur(10px);  /* for Safari support */
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    height: fit-content;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -149,8 +181,7 @@ button:focus-visible {
 .ui-disabled {
     opacity: 0;
     pointer-events: none;
-    /*visibility: hidden;*/
-    /*height: 0px !important;*/
+    visibility: hidden;
 }
 
 .divider {
@@ -161,4 +192,57 @@ button:focus-visible {
 .vertical-divider {
     width: 1px;
     background-color: #888888;
+}
+
+.modal-bg {
+    position: absolute;
+    top: 383px;
+    left: 0;
+    width: 100vw;
+    height: 110vh;
+    z-index: 50;
+    background: rgba(0, 0, 0, 0.5);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition: opacity 500ms ease-out, visibility 500ms ease-out;
+    backdrop-filter: blur(6px);
+}
+
+.fadable {
+    transition: opacity 500ms ease-out, visibility 500ms ease-out;
+}
+
+.is-visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    display: none;
+}
+
+/* Used to center elements on the x-axis that are positioned absolutely */
+.center-x {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Used to center elements on the y-axis that are positioned absolutely */
+.center-y {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Used to center elements on both axis that are positioned absolutely */
+.center {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
