@@ -1,4 +1,5 @@
 import {useUI} from "../context/UIContext.jsx";
+import convert from "color-convert";
 
 export function isStrEmpty(str) {
     return (str === null || str === undefined || str === '');
@@ -170,4 +171,21 @@ export function processTodoistDueDate(due, duration) {
     }
 
     return retVal;
+}
+
+const FG_LIGHTNESS_THRESHOLD = 170;
+
+export function determineFGLightness(red, green, blue) {
+    return (red > 170 || green > 170 || blue > 170) ? 'black' : 'white';
+}
+
+export function rgbToHex(color) {
+    if (isObjEmpty(color)) return;
+
+    return "#" + convert.rgb.hex(color.red, color.green, color.blue);
+}
+
+export function hexToRgb(hex) {
+    const [r, g, b] = convert.hex.rgb(hex);
+    return { red: r, green: g, blue: b };
 }

@@ -22,6 +22,9 @@ export function UIProvider({ children }) {
         setIsAppTrayOpen(!isAppTrayOpen);
     }
 
+    // Lights
+    const [ isModifyLightOpen, setIsModifyLightOpen ] = useState(false); // TODO: Revert to false
+
     // Weather views
     const [ isCurrentWeatherVisible, setIsCurrentWeatherVisible ] = useState(true); // TODO: Revert to true
     const [ isTodayWeatherVisible, setIsTodayWeatherVisible ] = useState(false);
@@ -227,7 +230,8 @@ export function UIProvider({ children }) {
             isAppTrayOpen, setIsAppTrayOpen, toggleAppTray,
             hideAll, hidePanels,
             isTodoistViewVisible, setIsTodoistViewVisible,
-            isLightsViewVisible, setIsLightsViewVisible
+            isLightsViewVisible, setIsLightsViewVisible,
+            isModifyLightOpen, setIsModifyLightOpen
         }}>
             {children}
         </UIContext.Provider>

@@ -34,7 +34,7 @@ function AppTrayModal() {
                     width: 100vw;
                     height: 100vh;
                     display: grid;
-                    z-index: 100;
+                    z-index: 300;
                     grid-template-columns: repeat(3, 1fr);
                     grid-column-gap: 25px;
                 }
@@ -70,6 +70,11 @@ function AppTrayModal() {
                 imgSrc={'/src/assets/images/appTray/lights-app-tray-icon-white.png'}
                 name={'Lights'}
                 visibilitySetter={setIsLightsViewVisible}
+            />
+
+            <AppTrayIcon
+                imgSrc={'/src/assets/images/appTray/calendar-app-tray-icon-white.png'}
+                name={'Calendar'}
             />
 
             <AppTrayIcon
