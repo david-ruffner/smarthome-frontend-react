@@ -2,10 +2,12 @@ import AppTrayIcon from "../AppTrayIcon.jsx";
 import {useUI} from "../../context/UIContext.jsx";
 import {useLightsUI} from "./LightsUIContext.jsx";
 import {determineFGLightness, isObjEmpty} from "../../utils/Utils.js";
-import {useState} from "react";
+import {useRef, useState} from "react";
 import BrightnessSlider from "./BrightnessSlider.jsx";
 import {BACKEND_HOST} from "../Constants.jsx";
 import CircularColorPicker from "./ColorPicker.jsx";
+import {hexToRgb, rgbToHex} from "../../utils/Utils.js";
+import * as ColorWheel from "react-hsv-ring";
 
 
 function ModifyLightModal() {
@@ -15,7 +17,7 @@ function ModifyLightModal() {
     } = useUI();
 
     const {
-        selectedLightBulb,
+        selectedLightBulb, setSelectedLightBulb,
         updateLightBulb,
         toggleLight
     } = useLightsUI();
@@ -58,9 +60,9 @@ function ModifyLightModal() {
                 'dimPercent': (brightness * 100),
                 'lightId': lightId,
                 'rgb': {
-                    'red': rgb.r,
-                    'green': rgb.g,
-                    'blue': rgb.b
+                    'red': rgb.red,
+                    'green': rgb.green,
+                    'blue': rgb.blue
                 }
             })
         })
@@ -95,6 +97,21 @@ function ModifyLightModal() {
 
     const textColor = determineFGLightness(selectedLightBulb?.color.red, selectedLightBulb?.color.green, selectedLightBulb?.color.blue);
     const toggleFGColor = determineFGLightness(selectedLightBulb?.color.red, selectedLightBulb?.color.green, selectedLightBulb?.color.blue);
+    const pendingColorRef = useRef("#ff0000");
+
+    function handleColorRelease() {
+        const newRgb = hexToRgb(pendingColorRef.current);
+        const updated = {
+            ...selectedLightBulb,
+            color: newRgb
+        }
+
+        setSelectedLightBulb(updated);
+        updateLightBulb(updated);
+
+        console.log(newRgb);
+        changeColor(updated.lightId, updated.brightness, newRgb);
+    }
 
     return <>
         <style>
@@ -136,7 +153,7 @@ function ModifyLightModal() {
                     padding: 15px;
                     justify-self: center;
                     text-align: center;
-                    background: rgba(${selectedLightBulb?.color.red}, ${selectedLightBulb?.color.green}, ${selectedLightBulb?.color.blue}, ${selectedLightBulb?.brightness});
+                    background: rgb(${selectedLightBulb?.color.red}, ${selectedLightBulb?.color.green}, ${selectedLightBulb?.color.blue});
                 }
                 
                 #modify-light-header > h1 {
@@ -181,7 +198,7 @@ function ModifyLightModal() {
                 }
                 
                 #ml-light-toggle-fg.ml-light-toggle-on {
-                    background: rgba(${selectedLightBulb?.color.red}, ${selectedLightBulb?.color.green}, ${selectedLightBulb?.color.blue}, ${selectedLightBulb?.brightness});
+                    background: rgb(${selectedLightBulb?.color.red}, ${selectedLightBulb?.color.green}, ${selectedLightBulb?.color.blue});
                 }
                 
                 #ml-light-toggle-circle {
@@ -194,7 +211,7 @@ function ModifyLightModal() {
                     height: 75%;
                     align-self: center;
                     border-radius: 50px;
-                    background: rgba(${selectedLightBulb?.color.red}, ${selectedLightBulb?.color.green}, ${selectedLightBulb?.color.blue}, ${selectedLightBulb?.brightness});
+                    background: rgb(${selectedLightBulb?.color.red}, ${selectedLightBulb?.color.green}, ${selectedLightBulb?.color.blue});
                     transition: left 500ms ease-in-out;
                 }
                 
@@ -207,7 +224,9 @@ function ModifyLightModal() {
 
         <div className={`modal-bg ${isModifyLightOpen ? 'is-visible' : ''}`}></div>
 
-        <div id={'modify-light-modal'} className={`${isModifyLightOpen ? 'is-visible' : 'is-hidden'}`}>
+        <div id={'modify-light-modal'}
+             className={`${isModifyLightOpen ? 'is-visible' : 'is-hidden'}`}
+             onContextMenu={(e) => e.preventDefault()}>
             <img id={'modify-light-modal-close'} onClick={onModalClose}
                  src="/src/assets/images/common/close-icon-white.png" alt=""/>
 
@@ -236,17 +255,23 @@ function ModifyLightModal() {
                 {/* Color Picker */}
                 <h2 className={'ml-text'}>Color</h2>
                 <div id={'ml-color-picker'} className={'ml-value'}>
-                    <CircularColorPicker
-                        size={260}
-                        value={{
-                            red: selectedLightBulb?.color?.red ?? 255,
-                            green: selectedLightBulb?.color?.green ?? 255,
-                            blue: selectedLightBulb?.color?.blue ?? 255,
-                        }}
-                        onColorChange={onColorChange}
-                        disabled={!selectedLightBulb?.lightStatus} // optional
-                        label={"Color"}
-                    />
+                    <div
+                        onPointerUp={handleColorRelease}>
+                        <ColorWheel.Root
+                            value={rgbToHex(selectedLightBulb?.color)}
+                            onValueChange={(val) => {
+                                pendingColorRef.current = val;
+                            }}
+                        >
+                            <ColorWheel.Wheel size={220} ringWidth={22}>
+                                <ColorWheel.HueRing />
+                                <ColorWheel.HueThumb />
+
+                                <ColorWheel.Area />
+                                <ColorWheel.AreaThumb />
+                            </ColorWheel.Wheel>
+                        </ColorWheel.Root>
+                    </div>
                 </div>
             </div>
         </div>

@@ -28,14 +28,14 @@ function LightBulbTile({ lightBulb }) {
             : "white";
 
     const onStyle = {
-        background: `rgba(${lightBulb.color.red}, ${lightBulb.color.green}, ${lightBulb.color.blue}, ${lightBulb.brightness})`,
+        background: `rgb(${lightBulb.color.red}, ${lightBulb.color.green}, ${lightBulb.color.blue})`,
         color: textColor,
     };
 
     const offStyle = {
         background: "none",
-        color: `rgba(${lightBulb.color.red}, ${lightBulb.color.green}, ${lightBulb.color.blue}, ${lightBulb.brightness})`,
-        border: `2px solid rgba(${lightBulb.color.red}, ${lightBulb.color.green}, ${lightBulb.color.blue}, ${lightBulb.brightness})`,
+        color: `rgb(${lightBulb.color.red}, ${lightBulb.color.green}, ${lightBulb.color.blue})`,
+        border: `2px solid rgb(${lightBulb.color.red}, ${lightBulb.color.green}, ${lightBulb.color.blue})`,
     };
 
     const timerRef = useRef(null);
@@ -58,7 +58,7 @@ function LightBulbTile({ lightBulb }) {
 
     function handleLongPress(lightId) {
         const lightBulb = getLightBulb(lightId);
-        setSelectedLightBulb(lightBulb);
+        setSelectedLightBulb({ ...lightBulb });
     }
 
     function handlePressStart(e) {
