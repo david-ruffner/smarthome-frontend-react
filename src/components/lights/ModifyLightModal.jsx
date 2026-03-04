@@ -8,6 +8,8 @@ import {BACKEND_HOST} from "../Constants.jsx";
 import CircularColorPicker from "./ColorPicker.jsx";
 import {hexToRgb, rgbToHex} from "../../utils/Utils.js";
 import * as ColorWheel from "react-hsv-ring";
+import LightToggle from "./LightToggle.jsx";
+import {changeBrightness, changeColor} from "./LightUtils.js";
 
 
 function ModifyLightModal() {

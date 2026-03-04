@@ -92,6 +92,9 @@ function LightBulbTile({ lightBulb }) {
     }
 
     useEffect(() => {
+        const lightId = selectedLightBulb?.lightId;
+        if (!lightId) return;
+
         showModifyLightModal(selectedLightBulb);
     }, [selectedLightBulb]);
 

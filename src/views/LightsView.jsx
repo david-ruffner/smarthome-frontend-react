@@ -1,17 +1,24 @@
 import {BACKEND_HOST} from "../components/Constants.jsx";
-import {useEffect, useState} from "react";
-import {isArrayEmpty, isObjEmpty} from "../utils/Utils.js";
+import {useEffect, useRef, useState} from "react";
+import {determineFGLightness, hexToRgb, isArrayEmpty, isObjEmpty, rgbToHex} from "../utils/Utils.js";
 import LightBulbTile from "../components/lights/LightBulbTile.jsx";
 import HueRoom from "../components/lights/HueRoom.js"
 import LightBulb from "../components/lights/LightBulb.js"
 import {useLightsUI} from "../components/lights/LightsUIContext.jsx";
+import LightToggle from "../components/lights/LightToggle.jsx";
+import BrightnessSlider from "../components/lights/BrightnessSlider.jsx";
+import {changeBrightness, changeColor} from "../components/lights/LightUtils.js";
+import * as ColorWheel from "react-hsv-ring";
 
 function LightsView() {
 
     const {
         hueRooms, setHueRooms,
         selectedRoom, setSelectedRoom,
-        lightBulbs, setLightBulbs
+        lightBulbs, setLightBulbs,
+        selectedLightBulb,
+        updateLightBulb,
+        toggleLight
     } = useLightsUI();
 
     async function fetchRoomNames() {
@@ -37,6 +44,10 @@ function LightsView() {
 
         return await roomNamesResp.json();
     }
+
+    const toggleFGColor = determineFGLightness(selectedLightBulb?.color.red, selectedLightBulb?.color.green, selectedLightBulb?.color.blue);
+    const avgBrightness = lightBulbs.reduce((sum, bulb) => sum + bulb.brightness, 0) / lightBulbs.length
+    const pendingColorRef = useRef("#ff0000");
 
     function handleRoomChange(e) {
         const roomId = e.target.value;
@@ -79,6 +90,43 @@ function LightsView() {
             })
     }, []);
 
+    function onToggleClick() {
+        // selectedLightBulb.lightStatus = !selectedLightBulb.lightStatus;
+        // toggleLight(selectedLightBulb.lightId, selectedLightBulb.lightStatus);
+        // updateLightBulb(selectedLightBulb);
+
+        lightBulbs.forEach(lb => {
+            lb.lightStatus = !lb.lightStatus;
+            toggleLight(lb.lightId, lb.lightStatus);
+            updateLightBulb(lb);
+        })
+    }
+
+    function onBrightnessChange(newBrightness0to100) {
+        // If your backend expects 0..1, convert here:
+        const normalized = newBrightness0to100 / 100;
+
+        lightBulbs.forEach(bulb => {
+            bulb.brightness = newBrightness0to100;
+            updateLightBulb(bulb);
+            changeBrightness(bulb.lightId, normalized);
+        })
+    }
+
+    function handleColorRelease() {
+        const newRgb = hexToRgb(pendingColorRef.current);
+
+        lightBulbs.forEach(bulb => {
+            const updated = {
+                ...bulb,
+                color: newRgb
+            }
+
+            updateLightBulb(updated);
+            changeColor(updated.lightId, updated.brightness, newRgb);
+        })
+    }
+
     return <>
         <style>
             {`
@@ -97,6 +145,76 @@ function LightsView() {
                     grid-column-gap: 50px;
                     grid-row-gap: 50px;
                     padding: 50px;
+                }
+                
+                hr {
+                    width: 75%;
+                    margin-bottom: 50px;
+                }
+                
+                #room-controls {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    grid-row-gap: 100px;
+                }
+                
+                .lv-text {
+                    user-select: none;
+                    align-self: center;
+                }
+                
+                .lv-value {
+                    align-self: center;
+                }
+                
+                #lv-light-toggle {
+                    width: 80%;
+                    height: 65px;
+                    border-radius: 35px;
+                    display: grid;
+                }
+                
+                #lv-light-toggle-bg {
+                    width: 100%;
+                    height: 65px;
+                    border-radius: 65px;
+                    z-index: 15;
+                    grid-column: 1;
+                    grid-row: 1;
+                }
+                
+                #lv-light-toggle-fg {
+                    width: 100%;
+                    height: 65px;
+                    border-radius: 65px;
+                    z-index: 55;
+                    grid-column: 1;
+                    grid-row: 1;
+                    transition: background 300ms ease-in-out;
+                    background: none;
+                }
+                
+                #lv-light-toggle-fg.lv-light-toggle-on {
+                    background: rgb(${lightBulbs[0]?.color.red}, ${lightBulbs[0]?.color.green}, ${lightBulbs[0]?.color.blue});
+                }
+                
+                #lv-light-toggle-circle {
+                    position: relative;
+                    left: 5%;
+                    grid-column: 1;
+                    grid-row: 1;
+                    z-index: 85;
+                    width: 20%;
+                    height: 75%;
+                    align-self: center;
+                    border-radius: 50px;
+                    background: rgb(${lightBulbs[0]?.color.red}, ${lightBulbs[0]?.color.green}, ${lightBulbs[0]?.color.blue});
+                    transition: left 500ms ease-in-out;
+                }
+                
+                #lv-light-toggle-circle.lv-light-toggle-on {
+                    background: ${toggleFGColor};
+                    left: 75%;
                 }
             `}
         </style>
@@ -120,6 +238,46 @@ function LightsView() {
                     lightBulb={lightBulb}
                 />
             ))}
+        </div>
+
+        <hr/>
+
+        {/* Room Controls */}
+        <div id={'room-controls'}>
+            <h2 className={'ml-text'}>On/Off</h2>
+            <div id={'lv-light-toggle'} onClick={onToggleClick} className={'lv-value'}>
+                <div id={'lv-light-toggle-bg'} className={'frosted-glass'}></div>
+                <div id={'lv-light-toggle-fg'} className={lightBulbs[0]?.lightStatus ? 'lv-light-toggle-on' : ''}></div>
+                <div id={'lv-light-toggle-circle'} className={lightBulbs[0]?.lightStatus ? 'lv-light-toggle-on' : ''}></div>
+            </div>
+
+            <h2 className={'lv-text'}>Brightness</h2>
+            <div id={'lv-brightness'} className={'lv-value'}>
+                <BrightnessSlider
+                    value={avgBrightness}
+                    onValueChange={onBrightnessChange}
+                />
+            </div>
+
+            <h2 className={'lv-text'}>Color</h2>
+            <div id={'lv-color-picker'} className={'lv-value'}>
+                <div
+                    onPointerUp={handleColorRelease}>
+                    <ColorWheel.Root
+                        onValueChange={(val) => {
+                            pendingColorRef.current = val;
+                        }}
+                    >
+                        <ColorWheel.Wheel size={220} ringWidth={22}>
+                            <ColorWheel.HueRing />
+                            <ColorWheel.HueThumb />
+
+                            <ColorWheel.Area />
+                            <ColorWheel.AreaThumb />
+                        </ColorWheel.Wheel>
+                    </ColorWheel.Root>
+                </div>
+            </div>
         </div>
     </>
 }
