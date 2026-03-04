@@ -22,11 +22,21 @@ function LightBulbTile({ lightBulb }) {
         isModifyLightOpen
     } = useUI();
 
-    var textColor = 'white';
+    const textColor =
+        (lightBulb.color.red > 170 || lightBulb.color.green > 170 || lightBulb.color.blue > 170)
+            ? "black"
+            : "white";
 
-    if (lightBulb.color.red > 170 || lightBulb.color.green > 170 || lightBulb.color.blue > 170) {
-        textColor = 'black';
-    }
+    const onStyle = {
+        background: `rgba(${lightBulb.color.red}, ${lightBulb.color.green}, ${lightBulb.color.blue}, ${lightBulb.brightness})`,
+        color: textColor,
+    };
+
+    const offStyle = {
+        background: "none",
+        color: `rgba(${lightBulb.color.red}, ${lightBulb.color.green}, ${lightBulb.color.blue}, ${lightBulb.brightness})`,
+        border: `2px solid rgba(${lightBulb.color.red}, ${lightBulb.color.green}, ${lightBulb.color.blue}, ${lightBulb.brightness})`,
+    };
 
     const timerRef = useRef(null);
     const didLongPressRef = useRef(false);
@@ -96,21 +106,11 @@ function LightBulbTile({ lightBulb }) {
                                 background 0.25s ease,
                                 border 0.25s ease;
                 }
-                
-                .light-bulb-tile.is-on {
-                    background: rgba(${lightBulb.color.red}, ${lightBulb.color.green}, ${lightBulb.color.blue}, ${lightBulb.brightness});
-                    color: ${textColor};
-                }
-                
-                .light-bulb-tile.is-off {
-                    background: none;
-                    color: rgba(${lightBulb.color.red}, ${lightBulb.color.green}, ${lightBulb.color.blue}, ${lightBulb.brightness});
-                    border: 2px solid rgba(${lightBulb.color.red}, ${lightBulb.color.green}, ${lightBulb.color.blue}, ${lightBulb.brightness});
-                }
             `}
         </style>
 
         <div className={`light-bulb-tile ${lightBulb.lightStatus ? 'is-on' : 'is-off'}`}
+             style={lightBulb.lightStatus ? onStyle : offStyle}
              onPointerDown={handlePressStart}
              onPointerUp={handlePressEnd}
              onPointerLeave={() => clearTimeout(timerRef.current)}
