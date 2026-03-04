@@ -142,7 +142,8 @@ function ModifyLightModal() {
                     justify-self: center;
                     display: grid;
                     grid-template-columns: repeat(2, 1fr);
-                    grid-template-rows: repeat(4, auto);
+                    grid-template-rows: repeat(4, fit-content(100%));
+                    grid-row-gap: 100px;
                 }
                 
                 #modify-light-header {
@@ -163,6 +164,7 @@ function ModifyLightModal() {
                 }
                 
                 .ml-text {
+                    user-select: none;
                     align-self: center;
                 }
                 
@@ -247,7 +249,7 @@ function ModifyLightModal() {
                 <h2 className={'ml-text'}>Brightness</h2>
                 <div id={'ml-brightness'} className={'ml-value'}>
                     <BrightnessSlider
-                        value={Math.round((selectedLightBulb?.brightness ?? 0) * 100)}
+                        value={(selectedLightBulb?.brightness ?? 0) * 100}
                         onValueChange={onBrightnessChange}
                     />
                 </div>

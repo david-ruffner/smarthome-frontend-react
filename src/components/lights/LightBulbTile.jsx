@@ -30,12 +30,14 @@ function LightBulbTile({ lightBulb }) {
     const onStyle = {
         background: `rgb(${lightBulb.color.red}, ${lightBulb.color.green}, ${lightBulb.color.blue})`,
         color: textColor,
+        opacity: (lightBulb.brightness > 1) ? lightBulb.brightness / 100 : lightBulb.brightness
     };
 
     const offStyle = {
         background: "none",
         color: `rgb(${lightBulb.color.red}, ${lightBulb.color.green}, ${lightBulb.color.blue})`,
         border: `2px solid rgb(${lightBulb.color.red}, ${lightBulb.color.green}, ${lightBulb.color.blue})`,
+        opacity: (lightBulb.brightness > 1) ? lightBulb.brightness / 100 : lightBulb.brightness
     };
 
     const timerRef = useRef(null);
