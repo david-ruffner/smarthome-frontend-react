@@ -1,6 +1,7 @@
 import {useEffect, useRef, useState} from "react";
 import {BACKEND_HOST} from "../Constants.jsx";
 import {useLightsUI} from "./LightsUIContext.jsx";
+import {useUI} from "../../context/UIContext.jsx";
 
 /**
  *
@@ -16,6 +17,10 @@ function LightBulbTile({ lightBulb }) {
         showModifyLightModal,
         selectedLightBulb, setSelectedLightBulb
     } = useLightsUI();
+
+    const {
+        isModifyLightOpen
+    } = useUI();
 
     var textColor = 'white';
 
@@ -47,6 +52,8 @@ function LightBulbTile({ lightBulb }) {
     }
 
     function handlePressStart(e) {
+        if (isModifyLightOpen) return;
+
         didLongPressRef.current = false;
 
         const lightId = e.currentTarget.dataset.lightId;
@@ -59,6 +66,8 @@ function LightBulbTile({ lightBulb }) {
     }
 
     function handlePressEnd(e) {
+        if (isModifyLightOpen) return;
+
         if (timerRef.current) {
             clearTimeout(timerRef.current);
             timerRef.current = null;
