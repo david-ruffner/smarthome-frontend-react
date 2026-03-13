@@ -1,6 +1,6 @@
 
 
-function TodayTimeEntry({ startTime, endTime }) {
+function TodayTimeEntry({ startTime, endTime, summary }) {
     const PX_HEIGHT_1_HR = 150;
 
     const startOfDay = new Date(startTime);
@@ -15,11 +15,11 @@ function TodayTimeEntry({ startTime, endTime }) {
 
     const minutesFromStartOfDay = (startDateTime - startOfDay) / 60000;
     const minutesFromStartOfDayTo5 = Math.round(minutesFromStartOfDay / 5) * 5;
-    const top = Math.round((minutesFromStartOfDayTo5 / 5) * 12.5) + 110;
+    const top = Math.round((minutesFromStartOfDayTo5 / 5) * 12.5) + 135;
     
     return <>
-        <div style={{height: `${height}px`, top: top}} className={'today-time-entry frosted-glass-blue'}>
-            <h3>Test</h3>
+        <div style={{height: `${height}px`, top: top, overflowY: 'scroll'}} className={'today-time-entry frosted-glass-blue'}>
+            <h3>{summary}</h3>
         </div>
     </>
 }

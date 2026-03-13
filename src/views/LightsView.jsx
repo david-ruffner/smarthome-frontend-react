@@ -1,6 +1,6 @@
 import {BACKEND_HOST} from "../components/Constants.jsx";
 import {useEffect, useRef, useState} from "react";
-import {determineFGLightness, hexToRgb, isArrayEmpty, isObjEmpty, rgbToHex} from "../utils/Utils.js";
+import {determineFGLightness, hexToRgb, isArrayEmpty, isObjEmpty, rgbToHex, stripRGBA} from "../utils/Utils.js";
 import LightBulbTile from "../components/lights/LightBulbTile.jsx";
 import HueRoom from "../components/lights/HueRoom.js"
 import LightBulb from "../components/lights/LightBulb.js"
@@ -9,6 +9,7 @@ import LightToggle from "../components/lights/LightToggle.jsx";
 import BrightnessSlider from "../components/lights/BrightnessSlider.jsx";
 import {changeBrightness, changeColor} from "../components/lights/LightUtils.js";
 import * as ColorWheel from "react-hsv-ring";
+import FavoriteColor from "../components/lights/FavoriteColor.jsx";
 
 function LightsView() {
 
@@ -18,8 +19,11 @@ function LightsView() {
         lightBulbs, setLightBulbs,
         selectedLightBulb,
         updateLightBulb,
-        toggleLight
+        toggleLight,
+        pendingColorRef, setPendingColorRef
     } = useLightsUI();
+
+    const [ favoriteRoomColors, setFavoriteRoomColors ] = useState([]);
 
     async function fetchRoomNames() {
 
@@ -42,12 +46,13 @@ function LightsView() {
             }
         })
 
-        return await roomNamesResp.json();
+        const jsonResp = await roomNamesResp.json();
+        console.log(jsonResp);
+        return jsonResp;
     }
 
     const toggleFGColor = determineFGLightness(selectedLightBulb?.color.red, selectedLightBulb?.color.green, selectedLightBulb?.color.blue);
     const avgBrightness = lightBulbs.reduce((sum, bulb) => sum + bulb.brightness, 0) / lightBulbs.length
-    const pendingColorRef = useRef("#ff0000");
 
     function handleRoomChange(e) {
         const roomId = e.target.value;
@@ -60,7 +65,8 @@ function LightsView() {
                 .then(data => {
                     const lightBulbs = Object.entries(data.lightBulbs).map(([id, obj]) =>
                         new LightBulb(obj.brightness, obj.color, obj.deviceId, obj.lightId, obj.lightStatus, obj.name));
-                    setLightBulbs(lightBulbs)
+                    setLightBulbs(lightBulbs);
+                    setFavoriteRoomColors(data.favoriteColors);
                 })
         }
     }, [ selectedRoom ])
@@ -73,6 +79,7 @@ function LightsView() {
                     const lightBulbs = Object.entries(data.lightBulbs).map(([id, obj]) =>
                         new LightBulb(obj.brightness, obj.color, obj.deviceId, obj.lightId, obj.lightStatus, obj.name));
                     setLightBulbs(lightBulbs);
+                    setFavoriteRoomColors(data.favoriteColors);
                 })
         }
     }, [ hueRooms ]);
@@ -216,6 +223,12 @@ function LightsView() {
                     background: ${toggleFGColor};
                     left: 75%;
                 }
+                
+                #lv-favorites-container {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    grid-row-gap: 25px;
+                }
             `}
         </style>
 
@@ -277,6 +290,20 @@ function LightsView() {
                         </ColorWheel.Wheel>
                     </ColorWheel.Root>
                 </div>
+            </div>
+
+            <h2 className={'lv-text'}>Favorite Colors</h2>
+            <div id={'lv-favorites-container'} className={'lv-value'}>
+                {favoriteRoomColors.map(roomColor => (
+                    <FavoriteColor
+                        controlDeviceId={roomColor.controlDeviceId}
+                        groupId={roomColor.groupId}
+                        lightId={roomColor.lightId}
+                        rgbaStr={roomColor.RGBAsString}
+                        colorStr={stripRGBA(roomColor.RGBAsString)}
+                        favoriteColorId={roomColor.favoriteColorId}
+                    />
+                ))}
             </div>
         </div>
     </>

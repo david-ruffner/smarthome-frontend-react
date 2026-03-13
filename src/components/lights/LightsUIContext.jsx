@@ -1,4 +1,4 @@
-import {createContext, useContext, useState} from "react";
+import {createContext, useContext, useRef, useState} from "react";
 import {useUI} from "../../context/UIContext.jsx";
 import {BACKEND_HOST} from "../Constants.jsx";
 
@@ -15,6 +15,7 @@ export function LightsUIProvider({ children }) {
     const [ selectedRoom, setSelectedRoom ] = useState(null);
     const [ lightBulbs, setLightBulbs ] = useState([]);
     const [ selectedLightBulb, setSelectedLightBulb ] = useState(null);
+    const pendingColorRef = useRef("#ff0000");
 
     function updateLightBulb(updatedBulb) {
         setLightBulbs(prev =>
@@ -55,7 +56,8 @@ export function LightsUIProvider({ children }) {
             lightBulbs, setLightBulbs,
             updateLightBulb, getLightBulb,
             selectedLightBulb, setSelectedLightBulb,
-            showModifyLightModal, toggleLight
+            showModifyLightModal, toggleLight,
+            pendingColorRef
         }}>
             {children}
         </LightsUIContext.Provider>

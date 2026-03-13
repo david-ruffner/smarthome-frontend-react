@@ -24,15 +24,6 @@ function Dashboard() {
         isCalendarViewVisible
     } = useUI();
 
-    // TODO: Remove
-    // useEffect(() => {
-    //     setTimeout(() => {
-    //         slideDashboardCarousel(1);
-    //     }, 3000)
-    // }, []);
-
-
-
     return (
         <>
             <style>{`                

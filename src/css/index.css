@@ -227,6 +227,10 @@ button:focus-visible {
     pointer-events: none;
 }
 
+.is-hidden * {
+    pointer-events: none;
+}
+
 /* Used to center elements on the x-axis that are positioned absolutely */
 .center-x {
     left: 50%;

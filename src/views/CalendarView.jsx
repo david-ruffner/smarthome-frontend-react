@@ -1,5 +1,7 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import TodayTimeEntry from "../components/calendar/TodayTimeEntry.jsx";
+import {BACKEND_HOST} from "../components/Constants.jsx";
+import {formatUTC, getMidnightDatePlusDays} from "../utils/Utils.js";
 
 
 function CalendarView() {
@@ -8,6 +10,8 @@ function CalendarView() {
     const [ isTomorrowCalendarPanelVisible, setIsTomorrowCalendarPanelVisible ] = useState(false);
     const [ is3DayCalendarPanelVisible, setIs3DayCalendarPanelVisible ] = useState(false);
     const [ is7DayCalendarPanelVisible, setIs7DayCalendarPanelVisible ] = useState(false);
+    const [ selectedPanelType, setSelectedPanelType ] = useState('today');
+    const [ calendarEvents, setCalendarEvents ] = useState([]);
 
     function hideAllPanels() {
         setIsTodayCalendarPanelVisible(false);
@@ -15,6 +19,49 @@ function CalendarView() {
         setIs3DayCalendarPanelVisible(false);
         setIs7DayCalendarPanelVisible(false);
     }
+
+    async function fetchCalendarEvents() {
+        const currentDT = formatUTC(getMidnightDatePlusDays(0));
+        let endDT = null;
+
+        switch (selectedPanelType) {
+            case 'today':
+                endDT = formatUTC(getMidnightDatePlusDays(1));
+                break;
+            case 'tomorrow':
+                endDT = formatUTC(getMidnightDatePlusDays(2));
+                break;
+            case '3day':
+                endDT = formatUTC(getMidnightDatePlusDays(4));
+                break;
+            case '7day':
+                endDT = formatUTC(getMidnightDatePlusDays(8));
+                break;
+        }
+
+        const res = await fetch(`${BACKEND_HOST}/calendar/getEvents?startTime=${currentDT}&endTime=${endDT}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        return await res.json();
+    }
+
+    useEffect(() => {
+        fetchCalendarEvents()
+            .then(events => {
+                setCalendarEvents(events);
+            })
+    }, [selectedPanelType]);
+
+    useEffect(() => {
+        fetchCalendarEvents()
+            .then(events => {
+                setCalendarEvents(events);
+            })
+    }, []);
 
     return <>
         <style>
@@ -124,6 +171,7 @@ function CalendarView() {
                         onClick={() => {
                             hideAllPanels();
                             setIsTodayCalendarPanelVisible(true);
+                            setSelectedPanelType('today');
                         }}
                     >Today</div>
 
@@ -132,6 +180,7 @@ function CalendarView() {
                         onClick={() => {
                             hideAllPanels();
                             setIsTomorrowCalendarPanelVisible(true);
+                            setSelectedPanelType('tomorrow');
                         }}
                     >Tomorrow</div>
 
@@ -140,6 +189,7 @@ function CalendarView() {
                         onClick={() => {
                             hideAllPanels();
                             setIs3DayCalendarPanelVisible(true);
+                            setSelectedPanelType('3day');
                         }}
                     >3 Days</div>
 
@@ -148,6 +198,7 @@ function CalendarView() {
                         onClick={() => {
                             hideAllPanels();
                             setIs7DayCalendarPanelVisible(true);
+                            setSelectedPanelType('7day');
                         }}
                     >7 Days</div>
                 </div>
@@ -156,10 +207,13 @@ function CalendarView() {
                     <div id={'today-inner-panel'} className={`inner-panel ${isTodayCalendarPanelVisible ? 'is-visible' : 'is-hidden'}`}>
                         <h1>Today</h1>
 
-                        <TodayTimeEntry
-                            startTime={'2026-03-04T01:00:00-05:00'}
-                            endTime={'2026-03-04T02:35:00-05:00'}
-                        />
+                        {calendarEvents.map(event => (
+                            <TodayTimeEntry
+                                startTime={event.startDateTime}
+                                endTime={event.endDateTime}
+                                summary={event.summary}
+                            />
+                        ))}
 
                         <h2>12 AM</h2>
                         <div className={'today-time-panel frosted-glass'}></div>
@@ -185,7 +239,29 @@ function CalendarView() {
                         <div className={'today-time-panel frosted-glass'}></div>
                         <h2>11 AM</h2>
                         <div className={'today-time-panel frosted-glass'}></div>
-                        <h2>12 AM</h2>
+                        <h2>12 PM</h2>
+                        <div className={'today-time-panel frosted-glass'}></div>
+                        <h2>1 PM</h2>
+                        <div className={'today-time-panel frosted-glass'}></div>
+                        <h2>2 PM</h2>
+                        <div className={'today-time-panel frosted-glass'}></div>
+                        <h2>3 PM</h2>
+                        <div className={'today-time-panel frosted-glass'}></div>
+                        <h2>4 PM</h2>
+                        <div className={'today-time-panel frosted-glass'}></div>
+                        <h2>5 PM</h2>
+                        <div className={'today-time-panel frosted-glass'}></div>
+                        <h2>6 PM</h2>
+                        <div className={'today-time-panel frosted-glass'}></div>
+                        <h2>7 PM</h2>
+                        <div className={'today-time-panel frosted-glass'}></div>
+                        <h2>8 PM</h2>
+                        <div className={'today-time-panel frosted-glass'}></div>
+                        <h2>9 PM</h2>
+                        <div className={'today-time-panel frosted-glass'}></div>
+                        <h2>10 PM</h2>
+                        <div className={'today-time-panel frosted-glass'}></div>
+                        <h2>11 PM</h2>
                         <div className={'today-time-panel frosted-glass'}></div>
                     </div>
 

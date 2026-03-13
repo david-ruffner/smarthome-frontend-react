@@ -11,8 +11,8 @@ export function UIProvider({ children }) {
     // View Visibility
     const [ isWeatherViewVisible, setIsWeatherViewVisible ] = useState(false);
     const [ isTodoistViewVisible, setIsTodoistViewVisible ] = useState(false);
-    const [ isLightsViewVisible, setIsLightsViewVisible ] = useState(false);
-    const [ isCalendarViewVisible, setIsCalendarViewVisible ] = useState(true);
+    const [ isLightsViewVisible, setIsLightsViewVisible ] = useState(true);
+    const [ isCalendarViewVisible, setIsCalendarViewVisible ] = useState(false);
 
     const [ friendlyName, setFriendlyName ] = useState('');
 

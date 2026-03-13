@@ -189,3 +189,37 @@ export function hexToRgb(hex) {
     const [r, g, b] = convert.hex.rgb(hex);
     return { red: r, green: g, blue: b };
 }
+
+export function hexToColorStr(hex) {
+    const [ r, g, b ] = convert.hex.rgb(hex);
+
+    return `${r}, ${g}, ${b}`
+}
+
+export function formatUTC(date) {
+    const pad = (n) => String(n).padStart(2, "0");
+
+    return (
+        date.getUTCFullYear() +
+        pad(date.getUTCMonth() + 1) +
+        pad(date.getUTCDate()) +
+        "T" +
+        pad(date.getUTCHours()) +
+        pad(date.getUTCMinutes()) +
+        pad(date.getUTCSeconds()) +
+        "Z"
+    );
+}
+
+export function getMidnightDatePlusDays(days = 0, timezone = "America/Detroit") {
+    const zdt = Temporal.Now.zonedDateTimeISO(timezone)
+        .add({ days })
+        .startOfDay();
+
+    return new Date(zdt.epochMilliseconds);
+}
+
+// Strips "rgba()" from rgbaString for update favorite color request
+export function stripRGBA(rgbaStr) {
+    return rgbaStr.split('rgba(')[1].split(')')[0];
+}
