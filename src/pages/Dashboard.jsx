@@ -12,6 +12,7 @@ import AppTrayModal from "../components/AppTrayModal.jsx";
 import LightsView from "../views/LightsView.jsx";
 import ModifyLightModal from "../components/lights/ModifyLightModal.jsx";
 import CalendarView from "../views/CalendarView.jsx";
+import InventoryView from "../views/InventoryView.jsx";
 
 function Dashboard() {
 
@@ -21,7 +22,8 @@ function Dashboard() {
         lockDashboard,
         isLightsViewVisible,
         isTodoistViewVisible,
-        isCalendarViewVisible
+        isCalendarViewVisible,
+        isInventoryViewVisible
     } = useUI();
 
     return (
@@ -135,6 +137,9 @@ function Dashboard() {
                             </div>
                             <div id={'calendar-parent'} style={{gridRow: 1, gridColumn: 1}} className={`parent-card ${isCalendarViewVisible ? 'is-visible' : 'is-hidden'}`}>
                                 <CalendarView />
+                            </div>
+                            <div id={'inventory-parent'} style={{gridRow: 1, gridColumn: 1}} className={`parent-card ${isInventoryViewVisible ? 'is-visible' : 'is-hidden'}`}>
+                                <InventoryView />
                             </div>
                         </div>
                     </div>

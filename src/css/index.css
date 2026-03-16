@@ -227,6 +227,11 @@ button:focus-visible {
     pointer-events: none;
 }
 
+.is-stacked {
+    grid-column: 1;
+    grid-row: 1;
+}
+
 .is-hidden * {
     pointer-events: none;
 }

@@ -11,13 +11,14 @@ export function UIProvider({ children }) {
     // View Visibility
     const [ isWeatherViewVisible, setIsWeatherViewVisible ] = useState(false);
     const [ isTodoistViewVisible, setIsTodoistViewVisible ] = useState(false);
-    const [ isLightsViewVisible, setIsLightsViewVisible ] = useState(true);
+    const [ isLightsViewVisible, setIsLightsViewVisible ] = useState(false); // TODO: Revert to true (default)
     const [ isCalendarViewVisible, setIsCalendarViewVisible ] = useState(false);
+    const [ isInventoryViewVisible, setIsInventoryViewVisible ] = useState(true) // TODO: Revert to false
 
     const [ friendlyName, setFriendlyName ] = useState('');
 
     // App Tray
-    const [ isAppTrayOpen, setIsAppTrayOpen ] = useState(false); // TODO: Revert to false
+    const [ isAppTrayOpen, setIsAppTrayOpen ] = useState(false);
 
     function toggleAppTray() {
         setIsAppTrayOpen(!isAppTrayOpen);
@@ -234,7 +235,8 @@ export function UIProvider({ children }) {
             isTodoistViewVisible, setIsTodoistViewVisible,
             isLightsViewVisible, setIsLightsViewVisible,
             isModifyLightOpen, setIsModifyLightOpen,
-            isCalendarViewVisible, setIsCalendarViewVisible
+            isCalendarViewVisible, setIsCalendarViewVisible,
+            isInventoryViewVisible, setIsInventoryViewVisible
         }}>
             {children}
         </UIContext.Provider>
