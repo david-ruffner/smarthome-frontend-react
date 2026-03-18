@@ -227,6 +227,15 @@ button:focus-visible {
     pointer-events: none;
 }
 
+.dropdown {
+    font-family: Roboto, sans-serif;
+    font-size: 32pt;
+    font-weight: 400;
+    padding: 15px;
+    border-radius: 25px;
+    margin-top: 25px;
+}
+
 .is-stacked {
     grid-column: 1;
     grid-row: 1;

@@ -1,6 +1,6 @@
 
 
-function InventoryViewButton({ imageName }) {
+function InventoryViewButton({ imageName, onClick }) {
 
     const BACK_PATH = '/src/assets/images/inventory/';
 
@@ -11,7 +11,7 @@ function InventoryViewButton({ imageName }) {
             }
         `}</style>
 
-        <div className={'inventory-view-btn'}>
+        <div onClick={() => { onClick() }} className={'inventory-view-btn'}>
             <img src={`${BACK_PATH}${imageName}`} alt=""/>
         </div>
     </>
