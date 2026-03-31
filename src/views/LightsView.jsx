@@ -10,8 +10,13 @@ import BrightnessSlider from "../components/lights/BrightnessSlider.jsx";
 import {changeBrightness, changeColor} from "../components/lights/LightUtils.js";
 import * as ColorWheel from "react-hsv-ring";
 import FavoriteColor from "../components/lights/FavoriteColor.jsx";
+import {useUI} from "../context/UIContext.jsx";
 
 function LightsView() {
+
+    const {
+        isLightsViewVisible
+    } = useUI();
 
     const {
         hueRooms, setHueRooms,
@@ -26,6 +31,7 @@ function LightsView() {
     const [ favoriteRoomColors, setFavoriteRoomColors ] = useState([]);
 
     async function fetchRoomNames() {
+        if (!isLightsViewVisible) return null;
 
         const roomNamesResp = await fetch(`${BACKEND_HOST}/lights/getRooms`, {
             method: 'GET',
@@ -38,6 +44,7 @@ function LightsView() {
     }
 
     async function fetchRoomLights(roomId) {
+        if (!isLightsViewVisible) return null;
 
         const roomNamesResp = await fetch(`${BACKEND_HOST}/lights/getRoom/${roomId}`, {
             method: 'GET',
@@ -92,8 +99,10 @@ function LightsView() {
     useEffect(() => {
         fetchRoomNames()
             .then(data => {
-                const rooms = Object.entries(data).map(([id, obj]) => new HueRoom(id, obj.name));
-                setHueRooms(rooms);
+                if (data !== null) {
+                    const rooms = Object.entries(data).map(([id, obj]) => new HueRoom(id, obj.name));
+                    setHueRooms(rooms);
+                }
             })
     }, []);
 

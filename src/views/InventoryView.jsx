@@ -3,7 +3,8 @@ import {useInventoryContext} from "../context/InventoryContext.jsx";
 import {useEffect, useState} from "react";
 import {BACKEND_HOST} from "../components/Constants.jsx";
 import {notify} from "../services/NotificationService.jsx";
-import {isArrayEmpty, logErr} from "../utils/Utils.js";
+import {isArrayEmpty, isStrEmpty, logErr} from "../utils/Utils.js";
+import InventoryRoomPage from "../pages/InventoryRoomPage.jsx";
 
 
 function InventoryView() {
@@ -14,54 +15,6 @@ function InventoryView() {
         isSearchPageVisible, setIsSearchPageVisible,
         hideAllPages
     } = useInventoryContext();
-
-    const [ currentRoomId, setCurrentRoomId ] = useState('');
-    const [ currentRoomName, setCurrentRoomName ] = useState('');
-    const [ rooms, setRooms ] = useState([]);
-
-    async function fetchRooms() {
-        const res = await fetch(`${BACKEND_HOST}/inventory/getAllRooms`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!res.ok) {
-            notify("There was an error while fetching rooms.")
-            logErr({
-                errMsg: "There was an error while fetching rooms",
-                data: res
-            })
-        }
-
-        return await res.json();
-    }
-
-    function handleRoomChange(e) {
-        const roomId = e.target.value;
-        const room = rooms.find(room => room.roomId === roomId);
-
-        setCurrentRoomId(roomId);
-        setCurrentRoomName(room ? room.roomName : '');
-
-        console.log(`Room ID: ${roomId}`);
-    }
-
-    useEffect(() => {
-        if (!isByRoomPageVisible) return;
-
-        fetchRooms()
-            .then((data) => {
-                setRooms(data.rooms);
-
-                if (!isArrayEmpty(data.rooms)) {
-                    setCurrentRoomId(data.rooms[0].roomId);
-                    setCurrentRoomName(data.rooms[0].roomName);
-                }
-            })
-
-    }, [isByRoomPageVisible]);
 
     return <>
         <style>{`
@@ -122,21 +75,7 @@ function InventoryView() {
                 <h2>By Category</h2>
             </div>
 
-            <div id={'inventory-by-room-page'} className={`by-category-page is-stacked ${isByRoomPageVisible ? 'is-visible' : 'is-hidden'}`}>
-                <h2>By Room</h2>
-
-                <select
-                    className={'dropdown'}
-                    value={currentRoomId}
-                    onChange={handleRoomChange}
-                    id={'inventory-room-select'}>
-                    {!isArrayEmpty(rooms) && rooms.map(room => (
-                        <option key={room.roomId} value={room.roomId}>
-                            {room.roomName}
-                        </option>
-                    ))}
-                </select>
-            </div>
+            <InventoryRoomPage />
 
             <div id={'inventory-scan-mode-page'} className={`by-category-page is-stacked ${isScanModePageVisible ? 'is-visible' : 'is-hidden'}`}>
                 <h2>Scan</h2>

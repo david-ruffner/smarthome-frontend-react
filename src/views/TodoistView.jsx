@@ -86,6 +86,8 @@ function TodoistView() {
     }
 
     async function fetchProjectTasks() {
+        if (!isTodoistViewVisible) return null;
+
         if (!isStrEmpty(todoistCurrentViewId)) {
             let url = `${BACKEND_HOST}/todoist/getTasksByProjectId/${todoistCurrentViewId}`;
 
@@ -146,6 +148,8 @@ function TodoistView() {
 
 
     async function fetchLabels() {
+        if (!isTodoistViewVisible) return null;
+
         const labelsResp = await fetch(`${BACKEND_HOST}/todoist/getLabels`, {
             method: 'POST',
             headers: {
@@ -157,6 +161,8 @@ function TodoistView() {
     }
 
     async function fetchPaginatedTasks(paginationToken) {
+        if (!isTodoistViewVisible) return null;
+
         const tasksResp = await fetch(`${BACKEND_HOST}/todoist/getPaginatedTasks/${paginationToken}`, {
             method: 'GET',
             headers: {
@@ -206,7 +212,7 @@ function TodoistView() {
         // Populate todoistMasterLabelsList
         fetchLabels()
             .then(data => {
-                if (!isArrayEmpty(data.labels)) {
+                if (data !== null && !isArrayEmpty(data.labels)) {
                     setTodoistMasterLabelsList(data.labels);
                 }
             })
