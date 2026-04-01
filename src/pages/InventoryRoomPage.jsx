@@ -3,7 +3,15 @@ import {useInventoryContext} from "../context/InventoryContext.jsx";
 import {BACKEND_HOST} from "../components/Constants.jsx";
 import {isArrayEmpty, isStrEmpty, logErr} from "../utils/Utils.js";
 import {notify} from "../services/NotificationService.jsx";
+import CustomSelect from "../components/global/CustomSelect.jsx";
 
+
+class CurrentRoom {
+    constructor(roomId, roomName) {
+        this.roomId = roomId;
+        this.roomName = roomName;
+    }
+}
 
 function InventoryRoomPage() {
 
@@ -11,8 +19,9 @@ function InventoryRoomPage() {
         isByRoomPageVisible
     } = useInventoryContext();
 
-    const [ currentRoomId, setCurrentRoomId ] = useState('');
-    const [ currentRoomName, setCurrentRoomName ] = useState('');
+    // const [ currentRoomId, setCurrentRoomId ] = useState('');
+    // const [ currentRoomName, setCurrentRoomName ] = useState('');
+
     const [ currentRoomItems, setCurrentRoomItems ] = useState([]);
     const [ currentRoomContainers, setCurrentRoomContainers ] = useState([]);
     const [ currentRoomContainerId, setCurrentRoomContainerId ] = useState('');
@@ -236,35 +245,7 @@ function InventoryRoomPage() {
     }, [currentRoomContainerId]);
 
     return <>
-        <style>{`
-            #inventory-by-room-page {
-                min-width: 0;
-                width: 100%;
-            }
-            
-            #room-items-table-wrapper {
-                width: 100%;
-                max-width: 720px;
-                overflow-x: auto;
-                min-width: 0;
-                display: block;
-            }
-            
-            #room-items-table {
-                font-size: 20pt;
-                margin-top: 50px;
-                border-collapse: collapse;
-                width: max-content;
-                min-width: 100%;
-            }
-            
-            #room-items-table th,
-            #room-items-table td {
-                border: 1px solid #fff;
-                padding: 25px;
-                white-space: nowrap;
-            }
-            
+        <style>{`            
             #room-selection-options {
                 display: grid;
                 grid-template-rows: repeat(2, 1fr);
@@ -277,22 +258,41 @@ function InventoryRoomPage() {
                 justify-self: center;
                 text-align: center;
             }
+            
+            #inventory-room-select {
+                height: max-content;
+            }
+            
+            #room-container-select {
+                margin-top: -1px;
+                margin-bottom: 50px;
+            }
+            
+            .item-outer-wrapper:last-of-type {
+                margin-bottom: 100px;
+            }
         `}</style>
         <div id={'inventory-by-room-page'} className={`by-category-page is-stacked ${isByRoomPageVisible ? 'is-visible' : 'is-hidden'}`}>
             <h2>By Room</h2>
 
             <div id={'room-selection-options'}>
-                <select
-                    className={'dropdown'}
-                    value={currentRoomId}
-                    onChange={handleRoomChange}
-                    id={'inventory-room-select'}>
-                    {!isArrayEmpty(rooms) && rooms.map(room => (
-                        <option key={room.roomId} value={room.roomId}>
-                            {room.roomName}
-                        </option>
-                    ))}
-                </select>
+                {/*<select*/}
+                {/*    className={'dropdown'}*/}
+                {/*    value={currentRoomId}*/}
+                {/*    onChange={handleRoomChange}*/}
+                {/*    id={'inventory-room-select'}>*/}
+                {/*    {!isArrayEmpty(rooms) && rooms.map(room => (*/}
+                {/*        <option key={room.roomId} value={room.roomId}>*/}
+                {/*            {room.roomName}*/}
+                {/*        </option>*/}
+                {/*    ))}*/}
+                {/*</select>*/}
+
+                <CustomSelect
+                    idName={'room-selector'}
+                    options={rooms}
+
+                />
 
                 <select
                     disabled={isContainerSelectorDisabled}
@@ -313,35 +313,34 @@ function InventoryRoomPage() {
             )}
 
             {!isArrayEmpty(currentRoomItems) && (
-                <div id={'room-items-table-wrapper'}>
-                    <table
-                        className={'frosted-glass'}
-                        id={'room-items-table'}
-                    >
-                        <thead>
-                        <tr>
-                            <td>Name</td>
-                            <td>Container</td>
-                            <td>UPC</td>
-                            <td>Quantity</td>
-                            <td>Category</td>
-                            <td>Description</td>
-                        </tr>
-                        </thead>
+                <div id={'items-outer-wrapper'}>
+                    {currentRoomItems.map((item) => (
+                        <div className={'item-outer-wrapper frosted-glass'}>
+                            <h3>Name</h3>
+                            <div className={'vertical-divider'}></div>
+                            <p>{item.itemName}</p>
 
-                        <tbody>
-                        {!isArrayEmpty(currentRoomItems) && currentRoomItems.map((item) => (
-                            <tr key={item.itemId}>
-                                <td>{item.itemName}</td>
-                                <td>{item.itemContainerName}</td>
-                                <td>{item.upc}</td>
-                                <td>{item.quantity}</td>
-                                <td>{item.categoryName}</td>
-                                <td>{item.description}</td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
+                            <h3>Container</h3>
+                            <div className={'vertical-divider'}></div>
+                            <p>{!isStrEmpty(item?.itemContainerName) ? item.itemContainerName : 'None'}</p>
+
+                            <h3>UPC</h3>
+                            <div className={'vertical-divider'}></div>
+                            <p>{item.upc}</p>
+
+                            <h3>Quantity</h3>
+                            <div className={'vertical-divider'}></div>
+                            <p className={item.isQuantityAtThreshold ? 'item-quantity-at-threshold' : ''}>{item.quantity}</p>
+
+                            <h3>Category</h3>
+                            <div className={'vertical-divider'}></div>
+                            <p>{!isStrEmpty(item.categoryName) ? item.categoryName : 'None'}</p>
+
+                            <h3>Description</h3>
+                            <div className={'vertical-divider'}></div>
+                            <p>{!isStrEmpty(item.description) ? item.description : 'None'}</p>
+                        </div>
+                    ))}
                 </div>
             )}
         </div>

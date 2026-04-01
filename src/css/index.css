@@ -18,6 +18,21 @@ body {
     --btn-soft-cyan: #a9fff7;
     --btn-blush-rose: #da667b;
     --err-state-red: rgba(255, 0, 0, 0.75);
+    --frosted-glass-background: rgba(255,255,255,0.05);
+    --frosted-glass-gray-background: rgba(255,255,255,0.75);
+    --frosted-glass-blue-background: rgba(0,0,255,0.15);
+    --frosted-glass-faded-blue-background: rgba(0,0,255,0.10);
+    --frosted-glass-light-blue-background: rgba(109, 176, 255, 0.65);
+    --frosted-glass-green-background: rgba(0, 255, 0, 0.55);
+    --frosted-glass-red-background: rgba(255, 0, 0, 0.55);
+    --frosted-glass-dark-gray-background: rgba(36, 36, 36, 0.65);
+
+    --common-border-color: rgba(255, 255, 255, 0.3);
+    --common-border: 1px solid var(--common-border-color);
+    --common-box-shadow: rgba(0, 0, 0, 0.1);
+    --common-border-radius: 10px;
+    --common-button-border-radius: 20px;
+    --common-blur: blur(10px);
 
 
     font-family: Roboto, sans-serif;
@@ -35,92 +50,92 @@ body {
 }
 
 .frosted-glass {
-    background: rgba(255, 255, 255, 0.05); /* translucent white */
-    backdrop-filter: blur(10px);          /* creates the frosted look */
-    -webkit-backdrop-filter: blur(10px);  /* for Safari support */
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    background: var(--frosted-glass-background); /* translucent white */
+    backdrop-filter: var(--common-blur);          /* creates the frosted look */
+    -webkit-backdrop-filter: var(--common-blur);  /* for Safari support */
+    border-radius: var(--common-border-radius);
+    border: 1px solid var(--common-border-color);
+    box-shadow: 0 4px 30px var(--common-box-shadow);
     height: fit-content;
 }
 
 .frosted-glass-gray {
-    background: rgba(88, 88, 88, 0.75); /* translucent white */
-    backdrop-filter: blur(10px);          /* creates the frosted look */
-    -webkit-backdrop-filter: blur(10px);  /* for Safari support */
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    background: var(--frosted-glass-gray-background); /* translucent white */
+    backdrop-filter: var(--common-blur);          /* creates the frosted look */
+    -webkit-backdrop-filter: var(--common-blur);  /* for Safari support */
+    border-radius: var(--common-border-radius);
+    border: 1px solid var(--common-border-color);
+    box-shadow: 0 4px 30px var(--common-box-shadow);
     height: fit-content;
 }
 
 .frosted-glass-blue {
-    background: rgba(0, 0, 255, 0.15); /* translucent white */
-    backdrop-filter: blur(10px);          /* creates the frosted look */
-    -webkit-backdrop-filter: blur(10px);  /* for Safari support */
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    background: var(--frosted-glass-blue-background); /* translucent white */
+    backdrop-filter: var(--common-blur);          /* creates the frosted look */
+    -webkit-backdrop-filter: var(--common-blur);  /* for Safari support */
+    border-radius: var(--common-border-radius);
+    border: 1px solid var(--common-border-color);
+    box-shadow: 0 4px 30px var(--common-box-shadow);
     height: fit-content;
 }
 
 .frosted-glass-faded-blue {
-    background: rgba(0, 0, 255, 0.10); /* translucent white */
-    backdrop-filter: blur(10px);          /* creates the frosted look */
-    -webkit-backdrop-filter: blur(10px);  /* for Safari support */
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    background: var(--frosted-glass-faded-blue-background); /* translucent white */
+    backdrop-filter: var(--common-blur);          /* creates the frosted look */
+    -webkit-backdrop-filter: var(--common-blur);  /* for Safari support */
+    border-radius: var(--common-border-radius);
+    border: 1px solid var(--common-border-color);
+    box-shadow: 0 4px 30px var(--common-box-shadow);
     height: fit-content;
 }
 
 .frosted-glass-light-blue {
-    background: rgba(109, 176, 255, 0.65); /* translucent white */
-    backdrop-filter: blur(10px);          /* creates the frosted look */
-    -webkit-backdrop-filter: blur(10px);  /* for Safari support */
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    background: var(--frosted-glass-light-blue-background); /* translucent white */
+    backdrop-filter: var(--common-blur);          /* creates the frosted look */
+    -webkit-backdrop-filter: var(--common-blur);  /* for Safari support */
+    border-radius: var(--common-border-radius);
+    border: 1px solid var(--common-border-color);
+    box-shadow: 0 4px 30px var(--common-box-shadow);
     height: fit-content;
 }
 
 .frosted-glass-green {
-    background: rgba(0, 255, 0, 0.55); /* translucent white */
-    backdrop-filter: blur(10px);          /* creates the frosted look */
-    -webkit-backdrop-filter: blur(10px);  /* for Safari support */
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    background: var(--frosted-glass-green-background); /* translucent white */
+    backdrop-filter: var(--common-blur);          /* creates the frosted look */
+    -webkit-backdrop-filter: var(--common-blur);  /* for Safari support */
+    border-radius: var(--common-border-radius);
+    border: 1px solid var(--common-border-color);
+    box-shadow: 0 4px 30px var(--common-box-shadow);
     height: fit-content;
 }
 
 .frosted-glass-red {
-    background: rgba(255, 0, 0, 0.55); /* translucent white */
-    backdrop-filter: blur(10px);          /* creates the frosted look */
-    -webkit-backdrop-filter: blur(10px);  /* for Safari support */
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    background: var(--frosted-glass-red-background); /* translucent white */
+    backdrop-filter: var(--common-blur);          /* creates the frosted look */
+    -webkit-backdrop-filter: var(--common-blur);  /* for Safari support */
+    border-radius: var(--common-border-radius);
+    border: 1px solid var(--common-border-color);
+    box-shadow: 0 4px 30px var(--common-box-shadow);
     height: fit-content;
 }
 
 .frosted-glass-dark-gray {
-    background: rgba(36, 36, 36, 0.65); /* translucent white */
-    backdrop-filter: blur(10px);          /* creates the frosted look */
-    -webkit-backdrop-filter: blur(10px);  /* for Safari support */
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    background: var(--frosted-glass-dark-gray-background); /* translucent white */
+    backdrop-filter: var(--common-blur);          /* creates the frosted look */
+    -webkit-backdrop-filter: var(--common-blur);  /* for Safari support */
+    border-radius: var(--common-border-radius);
+    border: 1px solid var(--common-border-color);
+    box-shadow: 0 4px 30px var(--common-box-shadow);
     height: fit-content;
 }
 
 /* Used when we want to programatically change the background color, but keep the frosted glass look. */
 .frosted-glass-no-bg {
-    backdrop-filter: blur(10px);          /* creates the frosted look */
-    -webkit-backdrop-filter: blur(10px);  /* for Safari support */
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: var(--common-blur);          /* creates the frosted look */
+    -webkit-backdrop-filter: var(--common-blur);  /* for Safari support */
+    border-radius: var(--common-border-radius);
+    border: 1px solid var(--common-border-color);
+    box-shadow: 0 4px 30px var(--common-box-shadow);
     height: fit-content;
 }
 
@@ -262,4 +277,78 @@ button:focus-visible {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+#items-outer-wrapper {
+    height: 700px;
+    overflow-y: scroll;
+}
+
+.item-outer-wrapper:first-of-type {
+    margin-top: 50px;
+}
+
+.item-outer-wrapper:nth-of-type(n+2) {
+    margin-top: 35px;
+}
+
+.item-outer-wrapper {
+    width: 85%;
+    justify-self: center;
+    display: grid;
+    grid-template-columns: 34% 1% 65%;
+}
+
+.item-outer-wrapper .divider {
+    grid-column: 1 / span 3;
+}
+
+.item-outer-wrapper .vertical-divider {
+    height: 60%;
+    align-self: center;
+}
+
+.item-outer-wrapper h3,
+.item-outer-wrapper p {
+    text-align: center;
+    justify-self: center;
+    align-self: center;
+}
+
+.item-outer-wrapper h3 {
+    font-size: 18pt;
+}
+
+.item-outer-wrapper p {
+    font-size: 16pt;
+}
+
+.item-quantity-at-threshold {
+    color: rgba(212, 0, 0, 0.92);
+    font-weight: 800;
+    font-size: 18pt !important;
+}
+
+
+.items-table-wrapper {
+    width: 100%;
+    max-width: 720px;
+    overflow-x: auto;
+    min-width: 0;
+    display: block;
+}
+
+.items-table {
+    font-size: 20pt;
+    margin: 50px 25px;
+    border-collapse: collapse;
+    width: max-content;
+    min-width: 100%;
+}
+
+.items-table th,
+.items-table td {
+    border: 1px solid #fff;
+    padding: 25px;
+    white-space: nowrap;
 }

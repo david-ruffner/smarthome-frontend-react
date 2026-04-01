@@ -58,6 +58,8 @@ function TodoistLabelModal() {
     }
 
     useEffect(() => {
+        if (!isTodoistLabelModalVisible) return;
+
         console.log(`todoistLabelsActiveMap has changed`);
     }, [todoistLabelsActiveMap]);
 

@@ -5,6 +5,7 @@ import {BACKEND_HOST} from "../components/Constants.jsx";
 import {notify} from "../services/NotificationService.jsx";
 import {isArrayEmpty, isStrEmpty, logErr} from "../utils/Utils.js";
 import InventoryRoomPage from "../pages/InventoryRoomPage.jsx";
+import InventoryCategoryPage from "../pages/InventoryCategoryPage.jsx";
 
 
 function InventoryView() {
@@ -71,10 +72,7 @@ function InventoryView() {
         </div>
 
         <div style={{display: 'grid'}}>
-            <div id={'inventory-by-category-page'} className={`by-category-page is-stacked ${isByCategoryPageVisible ? 'is-visible' : 'is-hidden'}`}>
-                <h2>By Category</h2>
-            </div>
-
+            <InventoryCategoryPage />
             <InventoryRoomPage />
 
             <div id={'inventory-scan-mode-page'} className={`by-category-page is-stacked ${isScanModePageVisible ? 'is-visible' : 'is-hidden'}`}>
