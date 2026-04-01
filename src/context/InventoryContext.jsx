@@ -8,6 +8,8 @@ export function InventoryProvider({ children }) {
     const [ isByRoomPageVisible, setIsByRoomPageVisible ] = useState(false);
     const [ isScanModePageVisible, setIsScanModePageVisible ] = useState(false);
     const [ isSearchPageVisible, setIsSearchPageVisible ] = useState(true);
+    const [ isSearchComponentVisible, setIsSearchComponentVisible ] = useState(true);
+    const [ isResultsComponentVisible, setIsResultsComponentVisible ] = useState(false);
 
     const viewOptions = [
         {
@@ -27,6 +29,8 @@ export function InventoryProvider({ children }) {
         setIsByRoomPageVisible(false);
         setIsScanModePageVisible(false);
         setIsSearchPageVisible(false);
+        setIsSearchComponentVisible(false);
+        setIsResultsComponentVisible(false)
     }
 
     return (
@@ -36,7 +40,9 @@ export function InventoryProvider({ children }) {
             isByRoomPageVisible, setIsByRoomPageVisible,
             isScanModePageVisible, setIsScanModePageVisible,
             isSearchPageVisible, setIsSearchPageVisible,
-            viewOptions, currentViewOption, setCurrentViewOption
+            viewOptions, currentViewOption, setCurrentViewOption,
+            isSearchComponentVisible, setIsSearchComponentVisible,
+            isResultsComponentVisible, setIsResultsComponentVisible
         }}>
             { children }
         </InventoryContext.Provider>

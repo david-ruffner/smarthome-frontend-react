@@ -1,14 +1,17 @@
 import {useInventoryContext} from "../context/InventoryContext.jsx";
 import CustomSelect from "../components/global/CustomSelect.jsx";
-import {useEffect, useState} from "react";
+import {useEffect, useLayoutEffect, useRef, useState} from "react";
 import {BACKEND_HOST} from "../components/Constants.jsx";
 import {notify} from "../services/NotificationService.jsx";
 import {isArrayEmpty, isObjEmpty, isStrEmpty, logErr} from "../utils/Utils.js";
+import Paginator from "../components/global/Paginator.jsx";
 
 
 function InventorySearchPage() {
     const {
-        isSearchPageVisible
+        isSearchPageVisible,
+        isSearchComponentVisible, setIsSearchComponentVisible,
+        isResultsComponentVisible, setIsResultsComponentVisible
     } = useInventoryContext();
 
     const filterSelections = [
@@ -69,6 +72,133 @@ function InventorySearchPage() {
         }
     ]
 
+    // TODO: Remove
+    // Used for testing of results page
+    const fakeResults = {
+        "items": [
+            {
+                "itemId": "ad842dc2-e001-4025-9c91-e06d748ccd08",
+                "itemName": "My Item",
+                "description": "Description",
+                "upc": "FJJFD8AJFDAJF",
+                "quantity": 3,
+                "categoryId": "dba854a2-ef50-4cfc-a7b6-dc89d144e2fe",
+                "categoryName": "Medicine",
+                "roomId": "874c84af-521e-4d35-83f4-d5be11bcd111",
+                "roomName": "Living Room",
+                "itemContainerId": "fjda8fjdaj8fda",
+                "itemContainerName": "Cupboard above fridge",
+                "isQuantityAtThreshold": false
+            },
+            {
+                "itemId": "c998d4a3-f480-4a95-ba05-ab51e4160003",
+                "itemName": "2nd Item",
+                "description": "Description",
+                "upc": "FJKFDAJ8FDJAF",
+                "quantity": 6,
+                "categoryId": "dba854a2-ef50-4cfc-a7b6-dc89d144e2fe",
+                "categoryName": "Medicine",
+                "roomId": "874c84af-521e-4d35-83f4-d5be11bcd111",
+                "roomName": "Living Room",
+                "itemContainerId": "828jrjfd8ajfas",
+                "itemContainerName": "Cupboard next to stairway",
+                "isQuantityAtThreshold": false
+            },
+            {
+                "itemId": "c998d4a3-f480-4a95-ba05-ab51e4160004",
+                "itemName": "3rd Item",
+                "description": "Description",
+                "upc": "JIFAHJ87FDHFA",
+                "quantity": 1,
+                "categoryId": "dba854a2-ef50-4cfc-a7b6-dc89d144e2fe",
+                "categoryName": "Medicine",
+                "roomId": "874c84af-521e-4d35-83f4-d5be11bcd111",
+                "roomName": "Living Room",
+                "itemContainerId": "828jrjfd8ajfaq",
+                "itemContainerName": "Middle cupboard under sink",
+                "isQuantityAtThreshold": true
+            },
+            {
+                "itemId": "c998d4a3-f480-4a95-ba05-ab51e4160005",
+                "itemName": "4th Item",
+                "description": "Description",
+                "upc": "JIFAHJ87FDHFB",
+                "quantity": 2,
+                "categoryId": "dba854a2-ef50-4cfc-a7b6-dc89d144e2fe",
+                "categoryName": "Medicine",
+                "roomId": "874c84af-521e-4d35-83f4-d5be11bcd111",
+                "roomName": "Living Room",
+                "itemContainerId": "828jrjfd8ajfaq",
+                "itemContainerName": "Middle cupboard under sink",
+                "isQuantityAtThreshold": true
+            },
+            {
+                "itemId": "c998d4a3-f480-4a95-ba05-ab51e4160006",
+                "itemName": "5th Item",
+                "description": null,
+                "upc": "JIFAHJ87FDHFC",
+                "quantity": 8,
+                "categoryId": "dba854a2-ef50-4cfc-a7b6-dc89d144e2fe",
+                "categoryName": "Medicine",
+                "roomId": "874c84af-521e-4d35-83f4-d5be11bcd111",
+                "roomName": "Living Room",
+                "itemContainerId": "828jrjfd8ajfaq",
+                "itemContainerName": "Middle cupboard under sink",
+                "isQuantityAtThreshold": false
+            },
+            {
+                "itemId": "c998d4a3-f480-4a95-ba05-ab51e4160007",
+                "itemName": "6th Item",
+                "description": null,
+                "upc": "JIFAHJ87FDHFD",
+                "quantity": 5,
+                "categoryId": "dba854a2-ef50-4cfc-a7b6-dc89d144e2fe",
+                "categoryName": "Medicine",
+                "roomId": "874c84af-521e-4d35-83f4-d5be11bcd111",
+                "roomName": "Living Room",
+                "itemContainerId": "828jrjfd8ajfaz",
+                "itemContainerName": "Far right cupboard over oven",
+                "isQuantityAtThreshold": false
+            }
+        ],
+        "shortCode": "SUCCESS"
+    }
+
+    const paginationOptions = [
+        {
+            value: '5',
+            label: '5'
+        },
+        {
+            value: '10',
+            label: '10'
+        },
+        {
+            value: '15',
+            label: '15'
+        },
+        {
+            value: '25',
+            label: '25'
+        },
+        {
+            value: '50',
+            label: '50'
+        },
+        {
+            value: '100',
+            label: '100'
+        }
+    ];
+    const [ currentPaginationOption, setCurrentPaginationOption ] = useState(paginationOptions[0]);
+    const [ pageNumbers, setPageNumbers ] = useState([]);
+    const [ paginatedResults, setPaginatedResults ] = useState([]);
+    const [ currentPageNumber, setCurrentPageNumber ] = useState(1);
+
+    // DOM refs
+    const searchPageRef = useRef(null);
+    const searchInputRef = useRef(null);
+
     // Data to be passed to the search algorithm
     const [ currentSearchTerm, setCurrentSearchTerm ] = useState('');
     const [ currentRoomFilter, setCurrentRoomFilter ] = useState(null);
@@ -79,6 +209,7 @@ function InventorySearchPage() {
     const [ currentQuantitySearchTerm, setCurrentQuantitySearchTerm ] = useState(null);
 
     // Supporting variables
+    const [ searchResults, setSearchResults ] = useState(null); // TODO: Set to empty array
     const [ currentFilter, setCurrentFilter ] = useState(filterSelections.find(fs => fs.value === 'none'));
     const [ isCategoryFilterVisible, setIsCategoryFilterVisible ] = useState(false);
     const [ isRoomFilterVisible, setIsRoomFilterVisible ] = useState(false);
@@ -173,13 +304,39 @@ function InventorySearchPage() {
     }
 
     /**
+    * Run a stub when isSearchComponentVisible changes to true, and after the transition finishes.
+     * Keeping this grayed out for now because it may be inconvenient to have a keyboard pop up when coming back to the search page.
+    */
+    // useEffect(() => {
+    //     if (!isSearchComponentVisible) return;
+    //
+    //     const pageEl = searchPageRef.current;
+    //     if (!pageEl) return;
+    //
+    //     const handleTransitionEnd = (e) => {
+    //         if (e.target !== pageEl) return;
+    //         searchInputRef.current?.focus();
+    //     };
+    //
+    //     pageEl.addEventListener("transitionend", handleTransitionEnd);
+    //
+    //     return () => {
+    //         pageEl.removeEventListener("transitionend", handleTransitionEnd);
+    //     };
+    // }, [isSearchComponentVisible]);
+
+    /**
     * Fires when the current room filter is updated
     */
     useEffect(() => {
-        if (isObjEmpty(currentRoomFilter)) return;
+        // if (isObjEmpty(currentRoomFilter)) return;
 
         fetchRoomContainers()
             .then((data) => {
+                // TODO: Remove
+                console.log(`Data:`);
+                console.log(data);
+
                 if (!isObjEmpty(data) && !isArrayEmpty(data.itemContainers)) {
                     const cf = [
                         {
@@ -297,13 +454,14 @@ function InventorySearchPage() {
             }
         `}</style>
 
-        <div id={'inventory-search-page'} className={`by-category-page is-stacked ${isSearchPageVisible ? 'is-visible' : 'is-hidden'}`}>
+        <div ref={searchPageRef} id={'inventory-search-page'} className={`by-category-page fadable is-stacked ${isSearchComponentVisible ? 'is-visible' : 'is-hidden'}`}>
             <h2>Search</h2>
 
             <div id={'by-term-container'} className={'term-container frosted-glass'}>
                 <h3>By Term</h3>
                 <input id={'inventory-search-bar'} type="text"
-                onChange={(e) => setCurrentSearchTerm(e.target.value)}/>
+                onChange={(e) => setCurrentSearchTerm(e.target.value)}
+                ref={searchInputRef}/>
             </div>
 
             <div id={'by-filter-container'} style={{
@@ -590,11 +748,35 @@ function InventorySearchPage() {
                     .then((results) => {
                         console.log(`Results:`);
                         console.log(results);
+                        console.log(JSON.stringify(results));
+
+                        setSearchResults(results);
+                        setIsSearchComponentVisible(false);
+                        setIsResultsComponentVisible(true);
                     })
             }}>
                 Search
             </button>
         </div>
+
+        <Paginator
+            idName={'inventory-results-page'}
+            visibilityToggle={isResultsComponentVisible}
+            searchResults={searchResults}
+            paginationOptions={paginationOptions}
+            currentPaginationOption={currentPaginationOption}
+            setCurrentPaginationOption={setCurrentPaginationOption}
+            pageNumbers={pageNumbers}
+            setPageNumbers={setPageNumbers}
+            paginatedResults={paginatedResults}
+            setPaginatedResults={setPaginatedResults}
+            currentPageNumber={currentPageNumber}
+            setCurrentPageNumber={setCurrentPageNumber}
+            onBackBtnClick={() => {
+                setIsSearchComponentVisible(true);
+                setIsResultsComponentVisible(false);
+            }}
+        />
     </>
 }
 

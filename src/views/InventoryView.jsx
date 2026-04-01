@@ -15,6 +15,8 @@ function InventoryView() {
         isByRoomPageVisible, setIsByRoomPageVisible,
         isScanModePageVisible, setIsScanModePageVisible,
         isSearchPageVisible, setIsSearchPageVisible,
+        isSearchComponentVisible, setIsSearchComponentVisible,
+        isResultsComponentVisible, setIsResultsComponentVisible,
         hideAllPages
     } = useInventoryContext();
 
@@ -68,6 +70,7 @@ function InventoryView() {
                 onClick={() => {
                     hideAllPages();
                     setIsSearchPageVisible(true);
+                    setIsSearchComponentVisible(true);
                 }}
             />
         </div>
