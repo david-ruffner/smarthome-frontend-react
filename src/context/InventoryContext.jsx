@@ -9,6 +9,19 @@ export function InventoryProvider({ children }) {
     const [ isScanModePageVisible, setIsScanModePageVisible ] = useState(false);
     const [ isSearchPageVisible, setIsSearchPageVisible ] = useState(false);
 
+    const viewOptions = [
+        {
+            value: 'card-view',
+            label: 'Card View'
+        },
+        {
+            value: 'list-view',
+            label: 'List View'
+        }
+    ]
+    // The default currentViewOption is 'list-view'
+    const [ currentViewOption, setCurrentViewOption ] = useState(viewOptions.find(vo => vo.value === 'list-view'));
+
     function hideAllPages() {
         setIsByCategoryPageVisible(false);
         setIsByRoomPageVisible(false);
@@ -22,7 +35,8 @@ export function InventoryProvider({ children }) {
             isByCategoryPageVisible, setIsByCategoryPageVisible,
             isByRoomPageVisible, setIsByRoomPageVisible,
             isScanModePageVisible, setIsScanModePageVisible,
-            isSearchPageVisible, setIsSearchPageVisible
+            isSearchPageVisible, setIsSearchPageVisible,
+            viewOptions, currentViewOption, setCurrentViewOption
         }}>
             { children }
         </InventoryContext.Provider>

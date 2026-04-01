@@ -15,26 +15,14 @@ class CurrentCategory {
 function InventoryCategoryPage() {
 
     const {
-        isByCategoryPageVisible
+        isByCategoryPageVisible,
+        viewOptions, currentViewOption, setCurrentViewOption
     } = useInventoryContext();
-
-    const viewOptions = [
-        {
-            value: 'card-view',
-            label: 'Card View'
-        },
-        {
-            value: 'list-view',
-            label: 'List View'
-        }
-    ]
 
     const [ currentCategories, setCurrentCategories ] = useState([]);
     const [ currentCategory, setCurrentCategory ] = useState(null);
     const [ isCategorySelectorHidden, setIsCategorySelectorHidden ] = useState(false);
     const [ currentItems, setCurrentItems ] = useState([]);
-    // The default currentViewOption is 'list-view'
-    const [ currentViewOption, setCurrentViewOption ] = useState(viewOptions.find(vo => vo.value === 'list-view'));
 
     async function fetchCategories() {
         if (!isByCategoryPageVisible) return null;
