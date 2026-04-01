@@ -6,6 +6,7 @@ import {notify} from "../services/NotificationService.jsx";
 import {isArrayEmpty, isStrEmpty, logErr} from "../utils/Utils.js";
 import InventoryRoomPage from "../pages/InventoryRoomPage.jsx";
 import InventoryCategoryPage from "../pages/InventoryCategoryPage.jsx";
+import InventorySearchPage from "../pages/InventorySearchPage.jsx";
 
 
 function InventoryView() {
@@ -79,9 +80,7 @@ function InventoryView() {
                 <h2>Scan</h2>
             </div>
 
-            <div id={'inventory-search-page'} className={`by-category-page is-stacked ${isSearchPageVisible ? 'is-visible' : 'is-hidden'}`}>
-                <h2>Search</h2>
-            </div>
+            <InventorySearchPage />
         </div>
     </>
 }

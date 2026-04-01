@@ -1,10 +1,11 @@
 import {useEffect, useRef, useState} from "react";
-import {isStrEmpty} from "../../utils/Utils.js";
+import {isObjEmpty, isStrEmpty} from "../../utils/Utils.js";
 
 function CustomSelect({ idName, options = [], value, onChange = () => {}, border, fontSize, borderRadius,
                       background, selectionFlashBackground, dropdownBackground, selectionFlashTime, selectOptionPadding,
                       selectOptionFontSize, upArrowOnMenuClose, arrowTransitionSpeed, selectDisplayBackgroundColor,
-                      selectDisplayTransitionTime, containerJustify, containerMargin}) {
+                      selectDisplayTransitionTime, containerJustify, containerMargin, containerGridColumn, boxHeight,
+                      isDisabled, containerAlign, styleOverride}) {
     const [open, setOpen] = useState(false);
     const [pressedValue, setPressedValue] = useState(null);
     const [isPressed, setIsPressed] = useState(false);
@@ -113,8 +114,18 @@ function CustomSelect({ idName, options = [], value, onChange = () => {}, border
                 `}
             </style>
 
-            <div id={idName} className="custom-select" ref={customSelectRef}>
+            <div id={idName} className={`custom-select ${isDisabled ? 'is-disabled' : ''}`}
+                style={styleOverride ? styleOverride : {
+                    gridColumn: containerGridColumn,
+                    alignSelf: !isStrEmpty(containerAlign) ? containerAlign : 'center'
+                }} ref={customSelectRef}>
                 <div
+                    style={{
+                        height: !isObjEmpty(boxHeight) ? boxHeight : 'auto',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}
                     className={`select-display ${open ? 'is-open' : ''}`}
                     onMouseDown={() => setIsPressed(true)}
                     onMouseUp={() => setIsPressed(false)}

@@ -5,13 +5,6 @@ import {notify} from "../services/NotificationService.jsx";
 import {isArrayEmpty, isObjEmpty, isStrEmpty, logErr} from "../utils/Utils.js";
 import CustomSelect from "../components/global/CustomSelect.jsx";
 
-class CurrentCategory {
-    constructor(categoryId, categoryName) {
-        this.categoryId = categoryId;
-        this.categoryName = categoryName;
-    }
-}
-
 function InventoryCategoryPage() {
 
     const {

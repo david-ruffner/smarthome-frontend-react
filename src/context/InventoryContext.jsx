@@ -5,9 +5,9 @@ const InventoryContext = createContext(null);
 
 export function InventoryProvider({ children }) {
     const [ isByCategoryPageVisible, setIsByCategoryPageVisible ] = useState(false); // TODO: Revert to true
-    const [ isByRoomPageVisible, setIsByRoomPageVisible ] = useState(true);
+    const [ isByRoomPageVisible, setIsByRoomPageVisible ] = useState(false);
     const [ isScanModePageVisible, setIsScanModePageVisible ] = useState(false);
-    const [ isSearchPageVisible, setIsSearchPageVisible ] = useState(false);
+    const [ isSearchPageVisible, setIsSearchPageVisible ] = useState(true);
 
     const viewOptions = [
         {

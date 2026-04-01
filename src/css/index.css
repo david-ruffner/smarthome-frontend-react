@@ -14,6 +14,7 @@ body {
     --background-gray: #242424;
     --btn-green: #6FC03F;
     --btn-light-blue: #3793ff;
+    --btn-dark-blue: #04387b;
     --electric-blue: #74bfff;
     --btn-soft-cyan: #a9fff7;
     --btn-blush-rose: #da667b;
@@ -351,4 +352,23 @@ button:focus-visible {
     border: 1px solid #fff;
     padding: 25px;
     white-space: nowrap;
+}
+
+.is-disabled,
+.is-disabled * {
+    pointer-events: none;
+}
+
+.is-disabled .select-display {
+    background-color: rgba(255,255,255,0.3) !important;
+    color: rgba(0,0,0,0.5) !important;
+}
+
+.override-tap-color {
+    -webkit-tap-highlight-color: transparent !important;
+}
+
+.no-select {
+    -webkit-user-select: none;
+    user-select: none;
 }
