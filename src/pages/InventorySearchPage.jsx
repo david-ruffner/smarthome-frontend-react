@@ -26,50 +26,68 @@ function InventorySearchPage() {
         }
     ]
 
+    // EQUAL("equal"),
+    //     LESS_THAN("less_than"),
+    //     LESS_THAN_OR_EQUAL("less_than_or_equal"),
+    //     MORE_THAN("more_than"),
+    //     MORE_THAN_OR_EQUAL("more_than_or_equal"),
+    //     IS_IN_THRESHOLD("is_in_threshold"),
+    //     IS_OUT_OF_THRESHOLD("is_out_of_threshold");
+
     const quantityFilters = [
+        {
+          value: 'none',
+          label: 'None'
+        },
         {
             value: 'equal',
             label: 'Equal To'
         },
         {
-            value: 'less-than',
+            value: 'less_than',
             label: 'Less Than'
         },
         {
-            value: 'less-than-or-equal',
+            value: 'less_than_or_equal',
             label: 'Less Than Or Equal'
         },
         {
-            value: 'more-than',
+            value: 'more_than',
             label: 'More Than'
         },
         {
-            value: 'more-than-or-equal',
+            value: 'more_than_or_equal',
             label: 'More Than Or Equal'
         },
         {
-            value: 'is-in-threshold',
+            value: 'is_in_threshold',
             label: 'Is Within Quantity Threshold'
         },
         {
-            value: 'is-out-of-threshold',
+            value: 'is_out_of_threshold',
             label: 'Is Out Of Quantity Threshold'
         }
     ]
 
+    // Data to be passed to the search algorithm
+    const [ currentSearchTerm, setCurrentSearchTerm ] = useState('');
+    const [ currentRoomFilter, setCurrentRoomFilter ] = useState(null);
+    const [ currentContainerFilter, setCurrentContainerFilter ] = useState(null);
+    const [ currentCategoryFilter, setCurrentCategoryFilter ] = useState(null);
+    const [ currentQuantityFilter, setCurrentQuantityFilter ] = useState(quantityFilters.find(
+        qf => qf.value === 'none'));
+    const [ currentQuantitySearchTerm, setCurrentQuantitySearchTerm ] = useState(null);
+
+    // Supporting variables
     const [ currentFilter, setCurrentFilter ] = useState(filterSelections.find(fs => fs.value === 'none'));
     const [ isCategoryFilterVisible, setIsCategoryFilterVisible ] = useState(false);
     const [ isRoomFilterVisible, setIsRoomFilterVisible ] = useState(false);
     const [ isContainerFilterVisible, setIsContainerFilterVisible ] = useState(false);
     const [ isContainerFilterDisabled, setIsContainerFilterDisabled ] = useState(false);
     const [ roomFilters, setRoomFilters ] = useState([]);
-    const [ currentRoomFilter, setCurrentRoomFilter ] = useState(null);
     const [ containerFilters, setContainerFilters ] = useState([]);
-    const [ currentContainerFilter, setCurrentContainerFilter ] = useState(null);
     const [ categoryFilters, setCategoryFilters ] = useState([]);
-    const [ currentCategoryFilter, setCurrentCategoryFilter ] = useState(null);
     const [ isQuantityInputVisible, setIsQuantityInputVisible ] = useState(true);
-    const [ currentQuantityFilter, setCurrentQuantityFilter ] = useState(quantityFilters[0]);
 
     async function fetchRooms() {
         if (!isSearchPageVisible) return null;
@@ -131,6 +149,29 @@ function InventorySearchPage() {
         return await res.json();
     }
 
+    async function fetchSearchResults(searchRequest) {
+        if (!isSearchPageVisible) return null;
+
+        if (isObjEmpty(searchRequest)) {
+            throw new Error('Tried to fetch search results with an empty search request object');
+        }
+
+        const res = await fetch(`${BACKEND_HOST}/inventory/searchItems`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(searchRequest)
+        });
+
+        if (!res.ok) {
+            const body = await res.json();
+            throw new Error(`There was an error while fetching room items: ${body.errMsg}`)
+        }
+
+        return await res.json();
+    }
+
     /**
     * Fires when the current room filter is updated
     */
@@ -140,10 +181,17 @@ function InventorySearchPage() {
         fetchRoomContainers()
             .then((data) => {
                 if (!isObjEmpty(data) && !isArrayEmpty(data.itemContainers)) {
-                    const cf = data.itemContainers.map(ic => ({
+                    const cf = [
+                        {
+                            value: 'all',
+                            label: 'All Containers'
+                        }
+                    ];
+
+                    cf.push(...data.itemContainers.map(ic => ({
                         value: ic.containerId,
                         label: ic.containerName
-                    }))
+                    })))
 
                     setContainerFilters(cf);
                     setCurrentContainerFilter(cf[0]);
@@ -217,7 +265,7 @@ function InventorySearchPage() {
                 font-weight: 400;
                 padding: 15px;
                 justify-self: center;
-                margin: 290px 0;
+                margin: 75px 0;
                 color: white;
                 border: none;
                 
@@ -254,7 +302,8 @@ function InventorySearchPage() {
 
             <div id={'by-term-container'} className={'term-container frosted-glass'}>
                 <h3>By Term</h3>
-                <input id={'inventory-search-bar'} type="text"/>
+                <input id={'inventory-search-bar'} type="text"
+                onChange={(e) => setCurrentSearchTerm(e.target.value)}/>
             </div>
 
             <div id={'by-filter-container'} style={{
@@ -274,12 +323,21 @@ function InventorySearchPage() {
                         setCurrentFilter(filter);
 
                         if (filter.value === 'none') {
+                            // Hide filter dropdowns
                             setIsRoomFilterVisible(false);
                             setIsContainerFilterVisible(false);
+
+                            // Clear out current filters
+                            setCurrentRoomFilter(null);
+                            setCurrentContainerFilter(null);
                         } else if (filter.value === 'by-room') {
+                            // Hide filter dropdowns
                             setIsRoomFilterVisible(true);
                             setIsContainerFilterVisible(true);
                             setIsCategoryFilterVisible(false);
+
+                            // Clear category filter
+                            setCurrentCategoryFilter(null);
 
                             fetchRooms()
                                 .then((data) => {
@@ -292,9 +350,13 @@ function InventorySearchPage() {
                                     setCurrentRoomFilter(roomFilters[0]);
                                 })
                         } else if (filter.value === 'by-category') {
+                            // Hide dropdowns
                             setIsRoomFilterVisible(false);
                             setIsContainerFilterVisible(false);
                             setIsCategoryFilterVisible(true);
+
+                            // Reset container filter
+                            setCurrentContainerFilter(null);
 
                             fetchCategories()
                                 .then((data) => {
@@ -374,26 +436,26 @@ function InventorySearchPage() {
                         options={categoryFilters}
                         value={currentCategoryFilter?.value}
                         onChange={(val) => {
-                            const filter = filterSelections.find(f => f.value === val);
-                            setCurrentFilter(filter);
+                            const filter = categoryFilters.find(f => f.value === val);
+                            setCurrentCategoryFilter(filter);
 
-                            if (filter.value === 'none') {
-                                setIsRoomFilterVisible(false);
-                                setIsContainerFilterVisible(false);
-                            } else if (filter.value === 'by-room') {
-                                setIsRoomFilterVisible(true);
-                                fetchRooms()
-                                    .then((data) => {
-                                        console.log(data);
-                                        const roomFilters = data.rooms.map(r => ({
-                                            value: r.roomId,
-                                            label: r.roomName
-                                        }))
-                                        setRoomFilters(roomFilters);
-                                        setCurrentRoomFilter(roomFilters[0]);
-                                    })
-                                setIsContainerFilterVisible(true);
-                            }
+                            // if (filter.value === 'none') {
+                            //     setIsRoomFilterVisible(false);
+                            //     setIsContainerFilterVisible(false);
+                            // } else if (filter.value === 'by-room') {
+                            //     setIsRoomFilterVisible(true);
+                            //     fetchRooms()
+                            //         .then((data) => {
+                            //             console.log(data);
+                            //             const roomFilters = data.rooms.map(r => ({
+                            //                 value: r.roomId,
+                            //                 label: r.roomName
+                            //             }))
+                            //             setRoomFilters(roomFilters);
+                            //             setCurrentRoomFilter(roomFilters[0]);
+                            //         })
+                            //     setIsContainerFilterVisible(true);
+                            // }
                         }}
                         background={'var(--frosted-glass-faded-blue-background)'}
                         fontSize={'18pt'}
@@ -469,12 +531,68 @@ function InventorySearchPage() {
                             border: 'var(--common-border)',
                             padding: '10px'
                         }}
+                        onChange={(e) => { setCurrentQuantitySearchTerm(e.target.value); }}
                     />
                 )}
             </div>
 
-            <button className={'override-tap-color no-select'} id={'search-btn'}>
-                Submit
+            <button className={'override-tap-color no-select'} id={'search-btn'}
+            onClick={() => {
+                const searchRequest = {
+                    searchTerm: !isStrEmpty(currentSearchTerm) ? currentSearchTerm : null,
+                    searchFilters: [],
+                    searchQuantityFilters: []
+                }
+
+                if (!isObjEmpty(currentRoomFilter)) {
+                    searchRequest.searchFilters.push({
+                        searchFilterType: 'room',
+                        searchFilterId: currentRoomFilter.value
+                    })
+                }
+
+                if (!isObjEmpty(currentContainerFilter) && currentContainerFilter.value !== 'all') {
+                    searchRequest.searchFilters.push({
+                        searchFilterType: 'room_with_container',
+                        searchFilterId: currentContainerFilter.value
+                    })
+                }
+
+                if (!isObjEmpty(currentCategoryFilter)) {
+                    searchRequest.searchFilters.push({
+                        searchFilterType: 'category',
+                        searchFilterId: currentCategoryFilter.value
+                    })
+                }
+
+                if (!isObjEmpty(currentQuantityFilter) && currentQuantityFilter.value !== 'none') {
+                    if (isStrEmpty(currentQuantitySearchTerm)) {
+                        // This is a in/out of threshold query. It doesn't matter what number we give, we just have to give one.
+                        searchRequest.searchQuantityFilters.push({
+                            searchQuantityType: currentQuantityFilter.value,
+                            searchQuantityVal: 0
+                        })
+                    } else {
+                        // This is a number value query. We need the specified number value for this.
+                        if (!isStrEmpty(currentQuantitySearchTerm)) {
+                            searchRequest.searchQuantityFilters.push({
+                                searchQuantityType: currentQuantityFilter.value,
+                                searchQuantityVal: parseInt(currentQuantitySearchTerm)
+                            })
+                        }
+                    }
+                }
+
+                // TODO: Remove
+                // console.log(`Search Request Obj:\n\n${JSON.stringify(searchRequest)}`);
+
+                fetchSearchResults(searchRequest)
+                    .then((results) => {
+                        console.log(`Results:`);
+                        console.log(results);
+                    })
+            }}>
+                Search
             </button>
         </div>
     </>
