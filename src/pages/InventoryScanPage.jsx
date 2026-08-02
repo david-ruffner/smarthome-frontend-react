@@ -22,6 +22,9 @@ function InventoryScanPage({ idName, visibilityToggle }) {
     const [ currentItemCategory, setCurrentItemCategory ] = useState(null);
     const [ currentItemDescription, setCurrentItemDescription ] = useState('');
 
+    const [ addItemNameInput, setAddItemNameInput ] = useState('');
+
+
     function handleScanMessage(msg) {
 
     }
@@ -78,7 +81,13 @@ function InventoryScanPage({ idName, visibilityToggle }) {
 
                 <h3>Name</h3>
                 <div className={'vertical-divider'}></div>
-                <p>{currentItemName}</p>
+                <input
+                    style={{
+                        marginRight: '25px'
+                    }}
+                   id={'add-item-name-input'}
+                   type={'text'}
+                   onChange={(e) => {  }} />
 
                 <h3>Container</h3>
                 <div className={'vertical-divider'}></div>
