@@ -42,7 +42,7 @@ export function fetchToken() {
         logErr({
             errMsg: 'token was not found in session storage',
             fileName: 'Utils.js',
-            lineNumber: '27'
+            lineNumber: '39'
         });
         return null;
     }
