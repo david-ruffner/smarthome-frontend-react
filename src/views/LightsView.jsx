@@ -104,7 +104,7 @@ function LightsView() {
                     setHueRooms(rooms);
                 }
             })
-    }, []);
+    }, [isLightsViewVisible]);
 
     function onToggleClick() {
         // selectedLightBulb.lightStatus = !selectedLightBulb.lightStatus;

@@ -182,6 +182,8 @@ export function UIProvider({ children }) {
         setIsTodoistViewVisible(false);
         setIsLightsViewVisible(false);
         setIsCalendarViewVisible(false);
+        setIsTodoistViewVisible(false);
+        setIsInventoryViewVisible(false);
     }, [])
 
     const showUserSelect = useCallback(() => {
