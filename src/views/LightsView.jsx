@@ -11,6 +11,7 @@ import {changeBrightness, changeColor} from "../components/lights/LightUtils.js"
 import * as ColorWheel from "react-hsv-ring";
 import FavoriteColor from "../components/lights/FavoriteColor.jsx";
 import {useUI} from "../context/UIContext.jsx";
+import {notify} from "../services/NotificationService.jsx";
 
 function LightsView() {
 
@@ -29,6 +30,10 @@ function LightsView() {
     } = useLightsUI();
 
     const [ favoriteRoomColors, setFavoriteRoomColors ] = useState([]);
+    const [ currentGroupId, setCurrentGroupId ] = useState(null);
+    const [ currentRoomId, setCurrentRoomId ] = useState(null);
+    const [ currentPickedColor, setCurrentPickedColor ] = useState(null);
+    const [ currentBrightness, setCurrentBrightness ] = useState(null);
 
     async function fetchRoomNames() {
         if (!isLightsViewVisible) return null;
@@ -41,6 +46,33 @@ function LightsView() {
         })
 
         return await roomNamesResp.json();
+    }
+
+    async function addFavoriteColor() {
+        if (!isLightsViewVisible) return null;
+
+        if (!currentPickedColor || !currentPickedColor.red) {
+            notify("Please select a color first");
+            return;
+        }
+
+        await fetch(`${BACKEND_HOST}/favorites/addFavorite`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                rgb: {
+                    red: currentPickedColor.red,
+                    green: currentPickedColor.green,
+                    blue: currentPickedColor.blue,
+                    alpha: currentBrightness
+                },
+                roomId: currentRoomId
+            })
+        });
+
+        reloadFavoriteColors();
     }
 
     async function fetchRoomLights(roomId) {
@@ -58,6 +90,19 @@ function LightsView() {
         return jsonResp;
     }
 
+    async function reloadFavoriteColors() {
+        const response = await fetch(`${BACKEND_HOST}/favorites/getFavorites/${currentRoomId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const jsonResp = await response.json();
+
+        setFavoriteRoomColors(jsonResp);
+    }
+
     const toggleFGColor = determineFGLightness(selectedLightBulb?.color.red, selectedLightBulb?.color.green, selectedLightBulb?.color.blue);
     const avgBrightness = lightBulbs.reduce((sum, bulb) => sum + bulb.brightness, 0) / lightBulbs.length
 
@@ -68,6 +113,9 @@ function LightsView() {
 
     useEffect(() => {
         if (!isObjEmpty(selectedRoom)) {
+            setCurrentRoomId(selectedRoom.roomId);
+            setCurrentGroupId(selectedRoom.groupId);
+
             fetchRoomLights(selectedRoom.roomId)
                 .then(data => {
                     const lightBulbs = Object.entries(data.lightBulbs).map(([id, obj]) =>
@@ -80,8 +128,10 @@ function LightsView() {
 
     useEffect(() => {
         if (!isArrayEmpty(hueRooms)) {
-            // fetchRoomLights(hueRooms[0].roomId) // TODO: Revert
-            fetchRoomLights(hueRooms.find((r) => r.roomName === 'Office').roomId)
+            setCurrentRoomId(hueRooms[0].roomId);
+            setCurrentGroupId(hueRooms[0].groupId);
+
+            fetchRoomLights(hueRooms[0].roomId) // TODO: Revert
                 .then(data => {
                     const lightBulbs = Object.entries(data.lightBulbs).map(([id, obj]) =>
                         new LightBulb(obj.brightness, obj.color, obj.deviceId, obj.lightId, obj.lightStatus, obj.name));
@@ -91,26 +141,17 @@ function LightsView() {
         }
     }, [ hueRooms ]);
 
-    // When lightBulbs is updated
-    // useEffect(() => {
-    //     // console.log(lightBulbs);
-    // }, [lightBulbs]);
-
     useEffect(() => {
         fetchRoomNames()
             .then(data => {
                 if (data !== null) {
-                    const rooms = Object.entries(data).map(([id, obj]) => new HueRoom(id, obj.name));
+                    const rooms = Object.entries(data).map(([id, obj]) => new HueRoom(id, obj.name, obj.groupToggleId));
                     setHueRooms(rooms);
                 }
             })
     }, [isLightsViewVisible]);
 
     function onToggleClick() {
-        // selectedLightBulb.lightStatus = !selectedLightBulb.lightStatus;
-        // toggleLight(selectedLightBulb.lightId, selectedLightBulb.lightStatus);
-        // updateLightBulb(selectedLightBulb);
-
         lightBulbs.forEach(lb => {
             lb.lightStatus = !lb.lightStatus;
             toggleLight(lb.lightId, lb.lightStatus);
@@ -122,6 +163,8 @@ function LightsView() {
         // If your backend expects 0..1, convert here:
         const normalized = newBrightness0to100 / 100;
 
+        setCurrentBrightness(normalized);
+
         lightBulbs.forEach(bulb => {
             bulb.brightness = newBrightness0to100;
             updateLightBulb(bulb);
@@ -131,6 +174,8 @@ function LightsView() {
 
     function handleColorRelease() {
         const newRgb = hexToRgb(pendingColorRef.current);
+
+        setCurrentPickedColor(newRgb);
 
         lightBulbs.forEach(bulb => {
             const updated = {
@@ -181,6 +226,23 @@ function LightsView() {
                 
                 .lv-value {
                     align-self: center;
+                }
+                
+                #lv-favorites-header {
+                    grid-row: 4;
+                    grid-column: 1;
+                }
+                
+                #add-favorite-color-btn {
+                    grid-row: 5;
+                    grid-column: 1 / span 2;
+                    margin-bottom: 100px;
+                    font-size: 22pt;
+                    font-weight: 500;
+                    justify-self: center;
+                    text-align: center;
+                    background-color: var(--frosted-glass-blue-background);
+                    display: block;
                 }
                 
                 #lv-light-toggle {
@@ -301,13 +363,13 @@ function LightsView() {
                 </div>
             </div>
 
-            <h2 className={'lv-text'}>Favorite Colors</h2>
+            <h2 id={'lv-favorites-header'} className={'lv-text'}>Favorite Colors</h2>
+            <button id={'add-favorite-color-btn'} onClick={addFavoriteColor}>Add Favorite</button>
             <div id={'lv-favorites-container'} className={'lv-value'}>
                 {favoriteRoomColors.map(roomColor => (
                     <FavoriteColor
-                        controlDeviceId={roomColor.controlDeviceId}
-                        groupId={roomColor.groupId}
-                        lightId={roomColor.lightId}
+                        groupId={currentGroupId}
+                        roomId={roomColor.roomId}
                         rgbaStr={roomColor.RGBAsString}
                         colorStr={stripRGBA(roomColor.RGBAsString)}
                         favoriteColorId={roomColor.favoriteColorId}

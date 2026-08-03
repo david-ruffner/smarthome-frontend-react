@@ -1,10 +1,12 @@
 import {useRef} from "react";
 import {useLightsUI} from "./LightsUIContext.jsx";
 import {hexToColorStr} from "../../utils/Utils.js";
+import todoistTask from "../todoist/TodoistTask.jsx";
+import {BACKEND_HOST} from "../Constants.jsx";
 
 
-function FavoriteColor({ rgbaStr, colorStr, favoriteColorId, controlDeviceId,
-                       groupId, lightId }) {
+function FavoriteColor({ rgbaStr, colorStr, roomId, favoriteColorId,
+                       groupId}) {
 
     const {
         pendingColorRef
@@ -15,14 +17,36 @@ function FavoriteColor({ rgbaStr, colorStr, favoriteColorId, controlDeviceId,
 
     const LONG_PRESS_MS = 500;
 
+    async function modifyGroupColor(red, green, blue, alpha, groupId) {
+        await fetch(`${BACKEND_HOST}/lights/modifyLight`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                rgb: {
+                    red: red,
+                    green: green,
+                    blue: blue,
+                    alpha: alpha
+                },
+                groupId: groupId
+            })
+        })
+    }
+
     function handleShortPress(e) {
         const favColorId = e.currentTarget.dataset.favoriteColorId;
         const colStr = e.currentTarget.dataset.colorString;
 
-        console.log(`Favorite Color ID: ${favColorId}`);
-        console.log(`Color String: ${colStr}`);
-
         // TODO: Set lights color to the selected color
+        let redVal = parseFloat(colorStr.split(',')[0]);
+        let greenVal = parseFloat(colorStr.split(',')[1]);
+        let blueVal = parseFloat(colorStr.split(',')[2]);
+        let alphaVal = parseFloat(colorStr.split(',')[3]);
+
+        // Purposefully ignoring the response
+        modifyGroupColor(redVal, greenVal, blueVal, alphaVal, groupId);
     }
 
     function handleLongPress(e) {
@@ -71,9 +95,7 @@ function FavoriteColor({ rgbaStr, colorStr, favoriteColorId, controlDeviceId,
             }}
              data-favorite-color-id={favoriteColorId}
              data-color-string={colorStr}
-             data-control-device-id={controlDeviceId}
-             data-light-id={lightId}
-             data-group-id={groupId}
+             data-room-id={roomId}
              className={'favorite-color'}
              onPointerDown={handlePressStart}
              onPointerUp={handlePressEnd}
