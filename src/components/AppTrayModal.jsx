@@ -8,7 +8,8 @@ function AppTrayModal() {
         isAppTrayOpen, setIsAppTrayOpen,
         setLockDashboard,
         setIsWeatherViewVisible, setIsTodoistViewVisible,
-        setIsLightsViewVisible, setIsCalendarViewVisible
+        setIsLightsViewVisible, setIsCalendarViewVisible,
+        hideAll
     } = useUI();
 
     if (isAppTrayOpen) {
@@ -18,6 +19,11 @@ function AppTrayModal() {
     function onAppTrayCloseClick() {
         setIsAppTrayOpen(false);
         setLockDashboard(false);
+    }
+
+    function showWeatherView() {
+        hideAll();
+        setIsWeatherViewVisible(true);
     }
 
     return <>

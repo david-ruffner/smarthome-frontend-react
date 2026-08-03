@@ -69,7 +69,7 @@ async function getUsers(hideAll, setIsUserSelectVisible) {
             lineNumber: '66'
         })
 
-        hideAll();
+        // hideAll();
         setIsUserSelectVisible(true);
     }
 

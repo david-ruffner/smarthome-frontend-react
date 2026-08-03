@@ -16,8 +16,8 @@ async function fetchCurrentWeather(isCurrentWeatherVisible, uiActions) {
 
     let token = fetchToken();
     if (!token) {
-        uiActions.hideAll();
-        uiActions.showUserSelect();
+        // uiActions.hideAll();
+        // uiActions.showUserSelect();
 
         return;
     }
@@ -39,8 +39,10 @@ async function fetchCurrentWeather(isCurrentWeatherVisible, uiActions) {
             lineNumber: '36'
         })
 
-        uiActions.hideAll();
-        uiActions.showUserSelect();
+        // uiActions.hideAll();
+        // uiActions.showUserSelect();
+
+        return;
     }
 
     return await res.json();

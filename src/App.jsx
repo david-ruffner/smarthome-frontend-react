@@ -27,6 +27,9 @@ function App() {
         if (isStrEmpty(token)) {
             setIsDashboardVisible(false);
             setIsLoginPageVisible(true);
+            setIsUserSelectVisible(true);
+
+            return;
         }
 
        const resp = await fetch(`${BACKEND_HOST}/userSettings/verifyToken?token=${token}`, {
@@ -44,6 +47,9 @@ function App() {
                fileName: 'App.jsx',
                lineNumber: '42'
            })
+
+           setIsDashboardVisible(false);
+           setIsLoginPageVisible(true);
            setIsUserSelectVisible(true);
 
            return;

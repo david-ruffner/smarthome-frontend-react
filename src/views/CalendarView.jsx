@@ -46,7 +46,12 @@ function CalendarView() {
             }
         });
 
-        return await res.json();
+        if (!res.ok) {
+            return [];
+        }
+
+        const data = await res.json();
+        return Array.isArray(data) ? data : [];
     }
 
     useEffect(() => {
@@ -207,8 +212,9 @@ function CalendarView() {
                     <div id={'today-inner-panel'} className={`inner-panel ${isTodayCalendarPanelVisible ? 'is-visible' : 'is-hidden'}`}>
                         <h1>Today</h1>
 
-                        {calendarEvents.map(event => (
+                        {Array.isArray(calendarEvents) && calendarEvents.map(event => (
                             <TodayTimeEntry
+                                key={`${event.startDateTime}-${event.summary}`}
                                 startTime={event.startDateTime}
                                 endTime={event.endDateTime}
                                 summary={event.summary}
