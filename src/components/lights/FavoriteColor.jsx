@@ -1,12 +1,13 @@
 import {useRef} from "react";
 import {useLightsUI} from "./LightsUIContext.jsx";
-import {hexToColorStr} from "../../utils/Utils.js";
+import {hexToColorStr, hexToRgb} from "../../utils/Utils.js";
 import todoistTask from "../todoist/TodoistTask.jsx";
 import {BACKEND_HOST} from "../Constants.jsx";
+import {notify} from "../../services/NotificationService.jsx";
 
 
 function FavoriteColor({ rgbaStr, colorStr, roomId, favoriteColorId,
-                       groupId}) {
+                       groupId, reloadFavoriteColors, reloadLightBulbs}) {
 
     const {
         pendingColorRef
@@ -16,6 +17,21 @@ function FavoriteColor({ rgbaStr, colorStr, roomId, favoriteColorId,
     const didLongPressRef = useRef(false);
 
     const LONG_PRESS_MS = 500;
+
+    async function removeFavorite(favoriteColorId, roomId) {
+        const resp = await fetch(`${BACKEND_HOST}/favorites/removeFavorite`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                favoriteColorId: favoriteColorId,
+                roomId: roomId
+            })
+        });
+
+        return await resp.json();
+    }
 
     async function modifyGroupColor(red, green, blue, alpha, groupId) {
         await fetch(`${BACKEND_HOST}/lights/modifyLight`, {
@@ -47,17 +63,22 @@ function FavoriteColor({ rgbaStr, colorStr, roomId, favoriteColorId,
 
         // Purposefully ignoring the response
         modifyGroupColor(redVal, greenVal, blueVal, alphaVal, groupId);
+        const newRGB = hexToRgb(pendingColorRef.current);
+        reloadLightBulbs();
     }
 
     function handleLongPress(e) {
         const favColorId = e.target.dataset.favoriteColorId;
-        const colStr = e.target.dataset.colorString;
+        const roomId = e.target.dataset.roomId;
 
-        console.log(`Favorite Color ID: ${favColorId}`);
-        console.log(`Color String: ${colStr}`);
-        console.log(`Pending Color Ref Val: ${hexToColorStr(pendingColorRef.current)}`);
-
-        // TODO: Update the pressed color to the current bulb color
+        removeFavorite(favColorId, roomId)
+            .then(() => {
+                reloadFavoriteColors();
+            })
+            .catch((resp) => {
+                notify("Sorry, there was a problem deleting that color. Please see the console.");
+                console.log(resp.message);
+            })
     }
 
     function handlePressStart(e) {

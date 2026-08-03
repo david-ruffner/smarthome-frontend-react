@@ -34,6 +34,10 @@ function LightsView() {
     const [ currentRoomId, setCurrentRoomId ] = useState(null);
     const [ currentPickedColor, setCurrentPickedColor ] = useState(null);
     const [ currentBrightness, setCurrentBrightness ] = useState(null);
+    const [ showLightBulbsOpacity, setShowLightBulbsOpacity ] = useState(false);
+    const [ showLightBulbsDisplay, setShowLightBulbsDisplay ] = useState(false);
+    const [ showLightsLoadingOpacity, setShowLightsLoadingOpacity ] = useState(false);
+    const [ showLightsLoadingDisplay, setShowLightsLoadingDisplay ] = useState(true);
 
     async function fetchRoomNames() {
         if (!isLightsViewVisible) return null;
@@ -115,14 +119,22 @@ function LightsView() {
         if (!isObjEmpty(selectedRoom)) {
             setCurrentRoomId(selectedRoom.roomId);
             setCurrentGroupId(selectedRoom.groupId);
+            setShowLightBulbsOpacity(true);
 
             fetchRoomLights(selectedRoom.roomId)
                 .then(data => {
+                    if (!data) return;
                     const lightBulbs = Object.entries(data.lightBulbs).map(([id, obj]) =>
                         new LightBulb(obj.brightness, obj.color, obj.deviceId, obj.lightId, obj.lightStatus, obj.name));
                     setLightBulbs(lightBulbs);
                     setFavoriteRoomColors(data.favoriteColors);
                 })
+                .finally(() => {
+                    setShowLightBulbsDisplay(false);
+                    setTimeout(() => {
+                        setShowLightBulbsOpacity(false);
+                    }, 50);
+                });
         }
     }, [ selectedRoom ])
 
@@ -130,14 +142,29 @@ function LightsView() {
         if (!isArrayEmpty(hueRooms)) {
             setCurrentRoomId(hueRooms[0].roomId);
             setCurrentGroupId(hueRooms[0].groupId);
+            setShowLightsLoadingOpacity(true);
 
             fetchRoomLights(hueRooms[0].roomId) // TODO: Revert
                 .then(data => {
+                    if (!data) return;
                     const lightBulbs = Object.entries(data.lightBulbs).map(([id, obj]) =>
                         new LightBulb(obj.brightness, obj.color, obj.deviceId, obj.lightId, obj.lightStatus, obj.name));
                     setLightBulbs(lightBulbs);
                     setFavoriteRoomColors(data.favoriteColors);
                 })
+                .finally(() => {
+                    setShowLightsLoadingOpacity(false);
+
+                    setShowLightsLoadingDisplay(false);
+                    setShowLightBulbsDisplay(true);
+
+                    setTimeout(() => {
+                        setShowLightBulbsOpacity(true);
+                    }, 50);
+                    // setTimeout(() => {
+                    //
+                    // }, 1500)
+                });
         }
     }, [ hueRooms ]);
 
@@ -173,19 +200,28 @@ function LightsView() {
     }
 
     function handleColorRelease() {
-        const newRgb = hexToRgb(pendingColorRef.current);
+        const newRGB = hexToRgb(pendingColorRef.current);
 
-        setCurrentPickedColor(newRgb);
+        setCurrentPickedColor(newRGB);
 
-        lightBulbs.forEach(bulb => {
-            const updated = {
-                ...bulb,
-                color: newRgb
-            }
+        reloadLightBulbs();
+    }
 
-            updateLightBulb(updated);
-            changeColor(updated.lightId, updated.brightness, newRgb);
-        })
+    function reloadLightBulbs() {
+        let roomId = null;
+
+        if (selectedRoom) {
+            roomId = selectedRoom.roomId;
+        } else {
+            roomId = hueRooms[0].roomId;
+        }
+
+        fetchRoomLights(roomId)
+            .then((data) => {
+                const lightBulbs = Object.entries(data.lightBulbs).map(([id, obj]) =>
+                    new LightBulb(obj.brightness, obj.color, obj.deviceId, obj.lightId, obj.lightStatus, obj.name));
+                setLightBulbs(lightBulbs);
+            })
     }
 
     return <>
@@ -206,6 +242,7 @@ function LightsView() {
                     grid-column-gap: 50px;
                     grid-row-gap: 50px;
                     padding: 50px;
+                    transition: opacity 1500ms ease-in-out;
                 }
                 
                 hr {
@@ -300,6 +337,11 @@ function LightsView() {
                     grid-template-columns: repeat(3, 1fr);
                     grid-row-gap: 25px;
                 }
+                
+                #light-bulb-tiles-loading {
+                    margin-top: 50px;
+                    transition: opacity 1500ms ease-in-out;
+                }
             `}
         </style>
 
@@ -315,8 +357,13 @@ function LightsView() {
             ))}
         </select>
 
+        <div id={'light-bulb-tiles-loading'} style={{ opacity: showLightsLoadingOpacity ? 1 : 0, display: showLightsLoadingDisplay ? 'block' : 'none' }}>
+            <h1>Loading Light Bulbs</h1>
+            <img src="/src/assets/images/common/white-spinning-icon.gif" width={250} height={250} alt="Light Bulbs Are Loading"/>
+        </div>
+
         {/* Light Bulbs */}
-        <div id={'light-bulb-tiles'}>
+        <div id={'light-bulb-tiles'} style={{ opacity: showLightBulbsOpacity ? 1 : 0, display: showLightBulbsDisplay ? 'grid' : 'none' }}>
             {lightBulbs.map(lightBulb => (
                 <LightBulbTile
                     lightBulb={lightBulb}
@@ -368,6 +415,8 @@ function LightsView() {
             <div id={'lv-favorites-container'} className={'lv-value'}>
                 {favoriteRoomColors.map(roomColor => (
                     <FavoriteColor
+                        reloadLightBulbs={reloadLightBulbs}
+                        reloadFavoriteColors={reloadFavoriteColors}
                         groupId={currentGroupId}
                         roomId={roomColor.roomId}
                         rgbaStr={roomColor.RGBAsString}
