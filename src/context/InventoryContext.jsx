@@ -1,4 +1,5 @@
 import {createContext, useContext, useState} from "react";
+import {useUI} from "./UIContext.jsx";
 
 
 const InventoryContext = createContext(null);
@@ -10,6 +11,34 @@ export function InventoryProvider({ children }) {
     const [ isSearchPageVisible, setIsSearchPageVisible ] = useState(false);
     const [ isSearchComponentVisible, setIsSearchComponentVisible ] = useState(false);
     const [ isResultsComponentVisible, setIsResultsComponentVisible ] = useState(false);
+
+    const [ clickedItemDetails, setClickedItemDetails ] = useState(null);
+
+    const [ showItemDetailsModalOpacity, setShowItemDetailsModalOpacity ] = useState(false);
+    const [ showItemDetailsModalDisplay, setShowItemDetailsModalDisplay ] = useState(false);
+
+    const {
+        showModalBG,
+        hideModalBG
+    } = useUI();
+
+    function showItemDetailModal(shouldShow) {
+        if (shouldShow) {
+            showModalBG();
+
+            setShowItemDetailsModalDisplay(true);
+            setTimeout(() => {
+                setShowItemDetailsModalOpacity(true)
+            }, 50);
+        } else {
+            hideModalBG();
+
+            setShowItemDetailsModalOpacity(false);
+            setTimeout(() => {
+                setShowItemDetailsModalDisplay(false)
+            }, 500);
+        }
+    }
 
     const viewOptions = [
         {
@@ -42,7 +71,11 @@ export function InventoryProvider({ children }) {
             isSearchPageVisible, setIsSearchPageVisible,
             viewOptions, currentViewOption, setCurrentViewOption,
             isSearchComponentVisible, setIsSearchComponentVisible,
-            isResultsComponentVisible, setIsResultsComponentVisible
+            isResultsComponentVisible, setIsResultsComponentVisible,
+            clickedItemDetails, setClickedItemDetails,
+            showItemDetailsModalOpacity, setShowItemDetailsModalOpacity,
+            showItemDetailsModalDisplay, setShowItemDetailsModalDisplay,
+            showItemDetailModal
         }}>
             { children }
         </InventoryContext.Provider>

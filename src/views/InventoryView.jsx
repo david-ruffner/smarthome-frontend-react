@@ -8,6 +8,7 @@ import InventoryRoomPage from "../pages/InventoryRoomPage.jsx";
 import InventoryCategoryPage from "../pages/InventoryCategoryPage.jsx";
 import InventorySearchPage from "../pages/InventorySearchPage.jsx";
 import InventoryScanPage from "../pages/InventoryScanPage.jsx";
+import {useUI} from "../context/UIContext.jsx";
 
 
 function InventoryView() {
@@ -18,8 +19,16 @@ function InventoryView() {
         isSearchPageVisible, setIsSearchPageVisible,
         isSearchComponentVisible, setIsSearchComponentVisible,
         isResultsComponentVisible, setIsResultsComponentVisible,
-        hideAllPages
+        hideAllPages,
+        showItemDetailsModalDisplay,
+        showItemDetailModal
     } = useInventoryContext();
+
+    const {
+        showModalBG, hideModalBG,
+        showModalBGOpacity,
+        showModalBGDisplay
+    } = useUI();
 
     return <>
         <style>{`
@@ -42,48 +51,58 @@ function InventoryView() {
             }
         `}</style>
 
-        <h1>Inventory View</h1>
+        <div id={'wrapper'}>
+            <div id={'inventory-view-page'}>
+                <h1>Inventory View</h1>
 
-        <div className={'frosted-glass'} id={'inventory-view-container'}>
-            <InventoryViewButton
-                imageName={'inventory-view-by-category-blue.png'}
-                onClick={() => {
-                    hideAllPages();
-                    setIsByCategoryPageVisible(true);
-                }}
-            />
-            <InventoryViewButton
-                imageName={'inventory-view-by-room-blue.png'}
-                onClick={() => {
-                    hideAllPages();
-                    setIsByRoomPageVisible(true);
-                }}
-            />
-            <InventoryViewButton
-                imageName={'inventory-view-scan-mode-blue.png'}
-                onClick={() => {
-                    hideAllPages();
-                    setIsScanModePageVisible(true);
-                }}
-            />
-            <InventoryViewButton
-                imageName={'inventory-view-search-blue.png'}
-                onClick={() => {
-                    hideAllPages();
-                    setIsSearchPageVisible(true);
-                    setIsSearchComponentVisible(true);
-                }}
-            />
-        </div>
+                <div className={'frosted-glass'} id={'inventory-view-container'}>
+                    <InventoryViewButton
+                        imageName={'inventory-view-by-category-blue.png'}
+                        onClick={() => {
+                            hideAllPages();
+                            setIsByCategoryPageVisible(true);
+                        }}
+                    />
+                    <InventoryViewButton
+                        imageName={'inventory-view-by-room-blue.png'}
+                        onClick={() => {
+                            hideAllPages();
+                            setIsByRoomPageVisible(true);
+                        }}
+                    />
+                    <InventoryViewButton
+                        imageName={'inventory-view-scan-mode-blue.png'}
+                        onClick={() => {
+                            hideAllPages();
+                            setIsScanModePageVisible(true);
+                        }}
+                    />
+                    <InventoryViewButton
+                        imageName={'inventory-view-search-blue.png'}
+                        onClick={() => {
+                            hideAllPages();
+                            setIsSearchPageVisible(true);
+                            setIsSearchComponentVisible(true);
+                        }}
+                    />
+                </div>
 
-        <div style={{display: 'grid'}}>
-            <InventoryCategoryPage />
-            <InventoryRoomPage />
-            <InventoryScanPage
-                idName={'inventory-scan-mode-page'}
-                visibilityToggle={isScanModePageVisible}
-            />
-            <InventorySearchPage />
+                <div style={{display: 'grid'}}>
+                    <InventoryCategoryPage />
+                    <InventoryRoomPage />
+                    <InventoryScanPage
+                        idName={'inventory-scan-mode-page'}
+                        visibilityToggle={isScanModePageVisible}
+                    />
+                    <InventorySearchPage />
+                </div>
+
+                {/*<button onClick={() => {*/}
+                {/*    showModalBG();*/}
+                {/*    showItemDetailModal(true)*/}
+                {/*}}>Show</button>*/}
+                {/*<button onClick={hideModalBG}>Hide</button>*/}
+            </div>
         </div>
     </>
 }

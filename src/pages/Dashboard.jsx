@@ -13,6 +13,9 @@ import LightsView from "../views/LightsView.jsx";
 import ModifyLightModal from "../components/lights/ModifyLightModal.jsx";
 import CalendarView from "../views/CalendarView.jsx";
 import InventoryView from "../views/InventoryView.jsx";
+import ItemModalTile from "../components/inventory/ItemModalTile.jsx";
+import {useInventoryContext} from "../context/InventoryContext.jsx";
+import ItemDetailModal from "../components/inventory/ItemDetailModal.jsx";
 
 function Dashboard() {
 
@@ -23,7 +26,10 @@ function Dashboard() {
         isLightsViewVisible,
         isTodoistViewVisible,
         isCalendarViewVisible,
-        isInventoryViewVisible
+        isInventoryViewVisible,
+        showModalBG, hideModalBG,
+        showModalBGOpacity,
+        showModalBGDisplay
     } = useUI();
 
     return (
@@ -107,43 +113,53 @@ function Dashboard() {
                 }
             `}</style>
 
-            <div id={'dashboard-container'} style={{overflowY: lockDashboard ? 'hidden' : 'scroll'}} className={isDashboardVisible ? 'is-visible' : ''}>
-                <TodoistLabelModal />
-                <AppTrayModal />
-                <ModifyLightModal />
-                {/*<TodoistTaskEditModal />*/}
+            <div id={'wrapper'} style={{display: 'grid'}}>
+                <div id={'dashboard'} style={{gridRow: 1, gridColumn: 1, zIndex: 1}}>
+                    <div id={'dashboard-container'} style={{overflowY: lockDashboard ? 'hidden' : 'scroll'}} className={isDashboardVisible ? 'is-visible' : ''}>
+                        <TodoistLabelModal />
+                        <AppTrayModal />
+                        <ModifyLightModal />
+                        {/*<TodoistTaskEditModal />*/}
 
-                <div id={'navbar-container'} className={`frosted-glass`}>
-                    <h1>Hi, {friendlyName}!</h1>
+                        <div id={'navbar-container'} className={`frosted-glass`}>
+                            <h1>Hi, {friendlyName}!</h1>
+                        </div>
+
+                        {/*<DashboardTrolley />*/}
+
+                        <AppTray />
+
+                        <SwipeContainer>
+                            <div className={'dashboard-viewport'}>
+                                <div id={'dashboard-stack'}>
+                                    <div data-index={-1} style={{gridRow: 1, gridColumn: 1}} id={'todoist-parent'} className={`parent-card ${isTodoistViewVisible ? 'is-visible' : 'is-hidden'}`}>
+                                        <TodoistView />
+                                    </div>
+                                    <div data-index={0} id={'weather-parent'} style={{gridRow: 1, gridColumn: 1}} className={`parent-card ${isWeatherViewVisible ? 'is-visible' : 'is-hidden'}`}>
+                                        <WeatherView
+                                            isWeatherViewVisible={isWeatherViewVisible}
+                                        />
+                                    </div>
+                                    <div data-index={1} id={'lights-parent'} style={{gridRow: 1, gridColumn: 1}} className={`parent-card ${isLightsViewVisible ? 'is-visible' : 'is-hidden'}`}>
+                                        <LightsView />
+                                    </div>
+                                    <div id={'calendar-parent'} style={{gridRow: 1, gridColumn: 1}} className={`parent-card ${isCalendarViewVisible ? 'is-visible' : 'is-hidden'}`}>
+                                        <CalendarView />
+                                    </div>
+                                    <div id={'inventory-parent'} style={{gridRow: 1, gridColumn: 1}} className={`parent-card ${isInventoryViewVisible ? 'is-visible' : 'is-hidden'}`}>
+                                        <InventoryView />
+                                    </div>
+                                </div>
+                            </div>
+                        </SwipeContainer>
+                    </div>
                 </div>
 
-                {/*<DashboardTrolley />*/}
+                <div style={{opacity: `${showModalBGOpacity ? 1 : 0}`,
+                    display: `${showModalBGDisplay ? 'grid' : 'none'}`,
+                    gridRow: 1, gridColumn: 1, zIndex: 50}} className={'modal-bg'}></div>
 
-                <AppTray />
-
-                <SwipeContainer>
-                    <div className={'dashboard-viewport'}>
-                        <div id={'dashboard-stack'}>
-                            <div data-index={-1} style={{gridRow: 1, gridColumn: 1}} id={'todoist-parent'} className={`parent-card ${isTodoistViewVisible ? 'is-visible' : 'is-hidden'}`}>
-                                <TodoistView />
-                            </div>
-                            <div data-index={0} id={'weather-parent'} style={{gridRow: 1, gridColumn: 1}} className={`parent-card ${isWeatherViewVisible ? 'is-visible' : 'is-hidden'}`}>
-                                <WeatherView
-                                    isWeatherViewVisible={isWeatherViewVisible}
-                                />
-                            </div>
-                            <div data-index={1} id={'lights-parent'} style={{gridRow: 1, gridColumn: 1}} className={`parent-card ${isLightsViewVisible ? 'is-visible' : 'is-hidden'}`}>
-                                <LightsView />
-                            </div>
-                            <div id={'calendar-parent'} style={{gridRow: 1, gridColumn: 1}} className={`parent-card ${isCalendarViewVisible ? 'is-visible' : 'is-hidden'}`}>
-                                <CalendarView />
-                            </div>
-                            <div id={'inventory-parent'} style={{gridRow: 1, gridColumn: 1}} className={`parent-card ${isInventoryViewVisible ? 'is-visible' : 'is-hidden'}`}>
-                                <InventoryView />
-                            </div>
-                        </div>
-                    </div>
-                </SwipeContainer>
+                <ItemDetailModal/>
             </div>
         </>
     )

@@ -1,9 +1,10 @@
 import {useEffect, useState} from "react";
 import {useInventoryContext} from "../context/InventoryContext.jsx";
 import {BACKEND_HOST} from "../components/Constants.jsx";
-import {isArrayEmpty, isStrEmpty, logErr} from "../utils/Utils.js";
+import {isArrayEmpty, isObjEmpty, isStrEmpty, logErr} from "../utils/Utils.js";
 import {notify} from "../services/NotificationService.jsx";
 import CustomSelect from "../components/global/CustomSelect.jsx";
+import {useUI} from "../context/UIContext.jsx";
 
 
 class CurrentRoom {
@@ -24,8 +25,16 @@ function InventoryRoomPage() {
 
     const {
         isByRoomPageVisible,
-        viewOptions, currentViewOption, setCurrentViewOption
+        viewOptions, currentViewOption, setCurrentViewOption,
+        clickedItemDetails, setClickedItemDetails,
+        showItemDetailModal
     } = useInventoryContext();
+
+    const {
+        showModalBG, hideModalBG,
+        showModalBGOpacity,
+        showModalBGDisplay
+    } = useUI();
 
     // const [ currentRoomId, setCurrentRoomId ] = useState('');
     // const [ currentRoomName, setCurrentRoomName ] = useState('');
@@ -38,6 +47,23 @@ function InventoryRoomPage() {
     // const [ currentRoomContainerName, setCurrentRoomContainerName ] = useState('');
     const [ isContainerSelectorDisabled, setIsContainerSelectorDisabled ] = useState(false);
     const [ currentRooms, setCurrentRooms ] = useState([]);
+    const [ featuredImages, setFeaturedImages ] = useState([]);
+
+    function addToFeaturedImages(imageId, itemId, bytes) {
+        console.log('Adding Image');
+        const temp = structuredClone(featuredImages);
+        temp.push({
+            imageId: imageId,
+            itemId: itemId,
+            bytes: bytes
+        });
+
+        setFeaturedImages(temp);
+    }
+
+    function getFeaturedImgByItemId(itemId) {
+        return featuredImages.find(img => img.itemId === itemId)
+    }
 
     async function fetchRooms() {
         if (!isByRoomPageVisible) return null;
@@ -172,6 +198,14 @@ function InventoryRoomPage() {
                     setCurrentRoomItems(null);
                 } else {
                     setCurrentRoomItems(data.items);
+
+                    data.items.forEach(item => {
+                        let favImg = item.images.find(img => {
+                            return img.isFeatured === true
+                        });
+
+                        addToFeaturedImages(favImg.imageId, item.item.itemId, favImg.bytes);
+                    })
                 }
             })
             .catch((err) => {
@@ -242,7 +276,20 @@ function InventoryRoomPage() {
                         if (data.shortCode === "NO_ROOM_ITEMS") {
                             setCurrentRoomItems(null);
                         } else {
-                            setCurrentRoomItems(data.items);
+                            let newItems = [];
+
+                            data.items.forEach(item => {
+                                newItems.push({
+                                    item: {
+                                        itemName: item.itemName,
+                                        quantity: item.quantity,
+                                        containerName: item.itemContainerName,
+                                        upc: item.upc
+                                    }
+                                })
+                            })
+
+                            setCurrentRoomItems(newItems);
                         }
                     })
                     .catch((err) => {
@@ -254,6 +301,50 @@ function InventoryRoomPage() {
             }
         }
     }, [currentRoomContainer]);
+
+    async function fetchItemDetails(itemId) {
+        if (!isByRoomPageVisible) return null;
+
+        const res = await fetch(`${BACKEND_HOST}/inventory/getItemDetails/${itemId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!res.ok) {
+            throw new Error(`There was an error while fetching item details`)
+        }
+
+        return await res.json();
+    }
+
+    useEffect(() => {
+        if (isObjEmpty(clickedItemDetails)) return;
+
+        showItemDetailModal(true);
+    }, [clickedItemDetails]);
+
+    function handleOnItemClick(e) {
+        let itemId = e.currentTarget.dataset.itemId;
+        fetchItemDetails(itemId)
+            .then((data => {
+                setClickedItemDetails({
+                    name: data.itemName,
+                    description: data.description,
+                    roomName: data.roomName,
+                    containerName: data.containerName,
+                    upc: data.upc,
+                    currentQuantity: data.quantity,
+                    quantityThreshold: data.quantityThreshold,
+                    notifyOnThreshold: data.notifyOnThreshold,
+                    categoryName: data.categoryName,
+                    // TOOD: Tags
+                    isFavorite: data.isFavorite
+                })
+            }))
+
+    }
 
     return <>
         <style>{`            
@@ -286,122 +377,127 @@ function InventoryRoomPage() {
                 margin-bottom: 100px;
             }
         `}</style>
-        <div id={'inventory-by-room-page'} className={`by-category-page is-stacked ${isByRoomPageVisible ? 'is-visible' : 'is-hidden'}`}>
-            <h2>By Room</h2>
+        <div className={'wrapper'} style={{display: 'grid'}}>
+            <div id={'inventory-by-room-page'} style={{gridColumn: 1, gridRow: 1, zIndex: 10, justifySelf: 'center'}} className={`by-category-page is-stacked ${isByRoomPageVisible ? 'is-visible' : 'is-hidden'}`}>
+                <h2>By Room</h2>
 
-            <div id={'room-selection-options'}>
-                <CustomSelect
-                    idName={'room-selector'}
-                    options={currentRooms}
-                    value={currentRoom?.value}
-                    onChange={(val) => {
-                        setCurrentRoom(currentRooms.find(cr => cr.value === val));
-                        // On room change, reset current container to "all"
-                        setCurrentRoomContainer(currentRoomContainers.find(crc => crc.value === 'all'));
-                    }}
-                    background={'var(--frosted-glass-faded-blue-background)'}
-                    fontSize={'18pt'}
-                    selectionFlashBackground={'var(--frosted-glass-light-blue-background)'}
-                    selectOptionPadding={'20px'}
-                    arrowTransitionSpeed={'300ms'}
-                    selectDisplayBackgroundColor={'var(--frosted-glass-light-blue-background)'}
-                    selectDisplayTransitionTime={'150ms'}
-                    selectionFlashTime={'150ms'}
-                    containerJustify={'center'}
-                    containerMargin={'25px 0 0 0'}
-                />
+                <div id={'room-selection-options'}>
+                    <CustomSelect
+                        idName={'room-selector'}
+                        options={currentRooms}
+                        value={currentRoom?.value}
+                        onChange={(val) => {
+                            setCurrentRoom(currentRooms.find(cr => cr.value === val));
+                            // On room change, reset current container to "all"
+                            setCurrentRoomContainer(currentRoomContainers.find(crc => crc.value === 'all'));
+                        }}
+                        background={'var(--frosted-glass-faded-blue-background)'}
+                        fontSize={'18pt'}
+                        selectionFlashBackground={'var(--frosted-glass-light-blue-background)'}
+                        selectOptionPadding={'20px'}
+                        arrowTransitionSpeed={'300ms'}
+                        selectDisplayBackgroundColor={'var(--frosted-glass-light-blue-background)'}
+                        selectDisplayTransitionTime={'150ms'}
+                        selectionFlashTime={'150ms'}
+                        containerJustify={'center'}
+                        containerMargin={'25px 0 0 0'}
+                    />
 
-                <CustomSelect
-                    idName={'room-container-selector'}
-                    options={currentRoomContainers}
-                    value={currentRoomContainer?.value}
-                    onChange={(val) => {
-                        setCurrentRoomContainer(currentRoomContainers.find(crc => crc.value === val));
-                    }}
-                    background={'var(--frosted-glass-faded-blue-background)'}
-                    fontSize={'18pt'}
-                    selectionFlashBackground={'var(--frosted-glass-light-blue-background)'}
-                    selectOptionPadding={'20px'}
-                    arrowTransitionSpeed={'300ms'}
-                    selectDisplayBackgroundColor={'var(--frosted-glass-light-blue-background)'}
-                    selectDisplayTransitionTime={'150ms'}
-                    selectionFlashTime={'150ms'}
-                    containerJustify={'center'}
-                    containerMargin={'25px 0 0 0'}
-                />
+                    <CustomSelect
+                        idName={'room-container-selector'}
+                        options={currentRoomContainers}
+                        value={currentRoomContainer?.value}
+                        onChange={(val) => {
+                            setCurrentRoomContainer(currentRoomContainers.find(crc => crc.value === val));
+                        }}
+                        background={'var(--frosted-glass-faded-blue-background)'}
+                        fontSize={'18pt'}
+                        selectionFlashBackground={'var(--frosted-glass-light-blue-background)'}
+                        selectOptionPadding={'20px'}
+                        arrowTransitionSpeed={'300ms'}
+                        selectDisplayBackgroundColor={'var(--frosted-glass-light-blue-background)'}
+                        selectDisplayTransitionTime={'150ms'}
+                        selectionFlashTime={'150ms'}
+                        containerJustify={'center'}
+                        containerMargin={'25px 0 0 0'}
+                    />
 
-                <CustomSelect
-                    idName={'view-type-select'}
-                    options={viewOptions}
-                    value={currentViewOption?.value}
-                    onChange={(val) => {
-                        setCurrentViewOption(viewOptions.find(vo => vo.value === val));
-                    }}
-                    background={'var(--frosted-glass-faded-blue-background)'}
-                    fontSize={'18pt'}
-                    selectionFlashBackground={'var(--frosted-glass-light-blue-background)'}
-                    selectOptionPadding={'20px'}
-                    arrowTransitionSpeed={'300ms'}
-                    selectDisplayBackgroundColor={'var(--frosted-glass-light-blue-background)'}
-                    selectDisplayTransitionTime={'150ms'}
-                    selectionFlashTime={'150ms'}
-                    containerJustify={'center'}
-                    containerMargin={'25px 0 0 0'}
-                />
+                    <CustomSelect
+                        idName={'view-type-select'}
+                        options={viewOptions}
+                        value={currentViewOption?.value}
+                        onChange={(val) => {
+                            setCurrentViewOption(viewOptions.find(vo => vo.value === val));
+                        }}
+                        background={'var(--frosted-glass-faded-blue-background)'}
+                        fontSize={'18pt'}
+                        selectionFlashBackground={'var(--frosted-glass-light-blue-background)'}
+                        selectOptionPadding={'20px'}
+                        arrowTransitionSpeed={'300ms'}
+                        selectDisplayBackgroundColor={'var(--frosted-glass-light-blue-background)'}
+                        selectDisplayTransitionTime={'150ms'}
+                        selectionFlashTime={'150ms'}
+                        containerJustify={'center'}
+                        containerMargin={'25px 0 0 0'}
+                    />
+                </div>
+
+                {currentRoomItems === null && (
+                    <h2>No Items In Room</h2>
+                )}
+
+                {!isArrayEmpty(currentRoomItems) && currentViewOption.value === 'list-view' && (
+                    <div id={'list-items-outer-wrapper'}>
+                        {currentRoomItems.map((item) => (
+                            <div key={item.item.itemId} onClick={handleOnItemClick} data-item-id={item.item.itemId} className={'item-outer-wrapper frosted-glass'}
+                                 style={{gridTemplateColumns: `${!isArrayEmpty(item.images) ? 'repeat(8, auto)' : 'repeat(7, auto)'}`, justifyContent: 'space-between'}}>
+                                <p style={{gridColumn: '1'}}>{!isStrEmpty(item?.item?.itemName) ? item.item.itemName : 'No Name'}</p>
+                                <div style={{gridColumn: '2'}} className={'vertical-divider'}></div>
+                                <p style={{gridColumn: '3'}}>{(!isObjEmpty(item?.item?.quantity)) ? item?.item?.quantity : 'No Quantity'}</p>
+                                <div style={{gridColumn: '4'}} className={'vertical-divider'}></div>
+                                <p style={{gridColumn: '5'}}>{!isStrEmpty(item?.item?.containerName) ? item.item.containerName : 'No Container'}</p>
+                                <div style={{gridColumn: '6'}} className={'vertical-divider'}></div>
+                                <p style={{gridColumn: '7'}}>{!isStrEmpty(item?.item?.upc) ? item.item.upc : 'No UPC'}</p>
+                                {!isArrayEmpty(item.images) && (
+                                    <img style={{gridColumn: '8'}} width={150} height={'auto'} src={`data:image/png;base64,${getFeaturedImgByItemId(item?.item?.itemId)?.bytes}`} alt=""/>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {!isArrayEmpty(currentRoomItems) && currentViewOption.value === 'card-view' && (
+                    <div id={'items-outer-wrapper'}>
+                        {currentRoomItems.map((item) => (
+                            <div className={'item-outer-wrapper frosted-glass'}>
+                                <h3>Name</h3>
+                                <div className={'vertical-divider'}></div>
+                                <p>{item.itemName}</p>
+
+                                <h3>Container</h3>
+                                <div className={'vertical-divider'}></div>
+                                <p>{!isStrEmpty(item?.itemContainerName) ? item.itemContainerName : 'None'}</p>
+
+                                <h3>UPC</h3>
+                                <div className={'vertical-divider'}></div>
+                                <p>{item.upc}</p>
+
+                                <h3>Quantity</h3>
+                                <div className={'vertical-divider'}></div>
+                                <p className={item.isQuantityAtThreshold ? 'item-quantity-at-threshold' : ''}>{item.quantity}</p>
+
+                                <h3>Category</h3>
+                                <div className={'vertical-divider'}></div>
+                                <p>{!isStrEmpty(item.categoryName) ? item.categoryName : 'None'}</p>
+
+                                <h3>Description</h3>
+                                <div className={'vertical-divider'}></div>
+                                <p>{!isStrEmpty(item.description) ? item.description : 'None'}</p>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
-
-            {currentRoomItems === null && (
-                <h2>No Items In Room</h2>
-            )}
-
-            {!isArrayEmpty(currentRoomItems) && currentViewOption.value === 'list-view' && (
-                <div id={'list-items-outer-wrapper'}>
-                    {currentRoomItems.map((item) => (
-                        <div key={item.itemId} className={'item-outer-wrapper frosted-glass'}
-                             style={{gridTemplateColumns: 'repeat(7, auto)'}}>
-                            <p style={{gridColumn: '1'}}>{item.itemName}</p>
-                            <div style={{gridColumn: '2'}} className={'vertical-divider'}></div>
-                            <p style={{gridColumn: '3'}} className={item.isQuantityAtThreshold ? 'item-quantity-at-threshold' : ''}>{item.quantity}</p>
-                            <div style={{gridColumn: '4'}} className={'vertical-divider'}></div>
-                            <p style={{gridColumn: '5'}}>{!isStrEmpty(item?.itemContainerName) ? item.itemContainerName : 'None'}</p>
-                            <div style={{gridColumn: '6'}} className={'vertical-divider'}></div>
-                            <p style={{gridColumn: '7'}}>{item.upc}</p>
-                        </div>
-                    ))}
-                </div>
-            )}
-
-            {!isArrayEmpty(currentRoomItems) && currentViewOption.value === 'card-view' && (
-                <div id={'items-outer-wrapper'}>
-                    {currentRoomItems.map((item) => (
-                        <div className={'item-outer-wrapper frosted-glass'}>
-                            <h3>Name</h3>
-                            <div className={'vertical-divider'}></div>
-                            <p>{item.itemName}</p>
-
-                            <h3>Container</h3>
-                            <div className={'vertical-divider'}></div>
-                            <p>{!isStrEmpty(item?.itemContainerName) ? item.itemContainerName : 'None'}</p>
-
-                            <h3>UPC</h3>
-                            <div className={'vertical-divider'}></div>
-                            <p>{item.upc}</p>
-
-                            <h3>Quantity</h3>
-                            <div className={'vertical-divider'}></div>
-                            <p className={item.isQuantityAtThreshold ? 'item-quantity-at-threshold' : ''}>{item.quantity}</p>
-
-                            <h3>Category</h3>
-                            <div className={'vertical-divider'}></div>
-                            <p>{!isStrEmpty(item.categoryName) ? item.categoryName : 'None'}</p>
-
-                            <h3>Description</h3>
-                            <div className={'vertical-divider'}></div>
-                            <p>{!isStrEmpty(item.description) ? item.description : 'None'}</p>
-                        </div>
-                    ))}
-                </div>
-            )}
         </div>
     </>
 }

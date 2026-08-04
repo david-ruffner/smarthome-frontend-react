@@ -56,6 +56,22 @@ export function UIProvider({ children }) {
 
     // Shared by all modals
     const [ lockDashboard, setLockDashboard ] = useState(false);
+    const [ showModalBGOpacity, setShowModalBGOpacity ] = useState(false);
+    const [ showModalBGDisplay, setShowModalBGDisplay ] = useState(false);
+
+    function showModalBG() {
+        setShowModalBGDisplay(true);
+        setTimeout(() => {
+            setShowModalBGOpacity(true);
+        }, 50);
+    }
+
+    function hideModalBG() {
+        setShowModalBGOpacity(false);
+        setTimeout(() => {
+            setShowModalBGDisplay(false);
+        }, 500);
+    }
 
     // Map weather view selectors to weather views
     const weatherViewMap = useMemo(() => ({
@@ -238,7 +254,10 @@ export function UIProvider({ children }) {
             isLightsViewVisible, setIsLightsViewVisible,
             isModifyLightOpen, setIsModifyLightOpen,
             isCalendarViewVisible, setIsCalendarViewVisible,
-            isInventoryViewVisible, setIsInventoryViewVisible
+            isInventoryViewVisible, setIsInventoryViewVisible,
+            showModalBG, hideModalBG,
+            showModalBGOpacity, setShowModalBGOpacity,
+            showModalBGDisplay, setShowModalBGDisplay
         }}>
             {children}
         </UIContext.Provider>
